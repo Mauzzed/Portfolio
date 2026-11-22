@@ -1,0 +1,3426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; overflow-x: hidden; background-color: #000; font-family: 'Inter', sans-serif; }
+        canvas { display: block; }
+        #loading {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem; letter-spacing: 2px;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        #loading-bar-container {
+            width: 300px;
+            height: 10px;
+            background: #222;
+            margin-top: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+        #loading-bar {
+            width: 0%;
+            height: 100%;
+            background: #00ffcc;
+            transition: width 0.1s ease;
+        }
+        #loading-text {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #888;
+        }
+
+        /* Valentin Chevalier Scroll-Lock Pinned Section Styles */
+        .showcase-pinned-section {
+            position: relative;
+            height: 350vh; /* Scroll-lock distance */
+            background: #0a0515;
+        }
+
+        .showcase-sticky-wrapper {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: #0a0515;
+            color: #ffffff;
+            font-family: sans-serif;
+            user-select: none;
+        }
+
+        .showcase-stage {
+            position: relative;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .showcase-stage {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Active Theory Spine Gallery styles */
+        .spine-gallery-section {
+            position: relative;
+            width: 100%;
+            height: 400vh; /* Scroll depth */
+            background: #ffffff;
+        }
+        .spine-sticky-wrapper {
+            position: sticky;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* WebGL Carousel overlay elements */
+        .project-details-block {
+            position: absolute;
+            bottom: 0px;
+            left: 50%;
+            transform: translateX(-50%) translateY(60px);
+            text-align: center;
+            z-index: 10;
+            pointer-events: none; /* Let canvas receive drags */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .project-details-block h2, .project-details-block p, .project-details-block a {
+            pointer-events: auto; /* Re-enable clicks for links */
+        }
+        /* Scroll Text Indicator */
+        .ring-scroll-hint {
+            color: #00ffcc;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-weight: 500;
+            opacity: 0.9;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            text-decoration-thickness: 1px;
+            text-decoration-color: rgba(0, 255, 204, 0.6);
+        }
+
+        .project-serif-heading {
+            font-family: "Cormorant Garamond", "Playfair Display", serif;
+            font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+            font-weight: 700;
+            margin: 0 0 8px;
+            color: #C5C8B8;
+            letter-spacing: -0.5px;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .project-impact-desc {
+            font-size: 1.05rem;
+            color: #a0a0a0;
+            line-height: 1.6;
+            margin: 0 0 24px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .see-more-btn {
+            display: inline-block;
+            color: #00ffcc;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-decoration: none;
+            text-transform: uppercase;
+            position: relative;
+            padding-bottom: 6px;
+        }
+
+        .see-more-btn .btn-underline {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1.5px;
+            background: #00ffcc;
+            transition: transform 0.3s ease;
+        }
+
+        .see-more-btn:hover .btn-underline {
+            transform: scaleX(1.15);
+        }
+
+        /* Side Navigation Arrows */
+        .nav-side-btn {
+            position: absolute;
+            bottom: 40px;
+            top: auto;
+            transform: none;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            font-family: sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .nav-side-btn.prev { left: 40px; }
+        .nav-side-btn.next { right: 40px; }
+
+        .nav-side-btn:hover {
+            background: #00ffcc;
+            color: #000000;
+            border-color: #00ffcc;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+        }
+    </style>
+<body>
+    <div id="loading">
+        <div style="margin-bottom: 15px;">BUILDING HIGH FIDELITY ENVIRONMENT...</div>
+        <div id="loading-bar-container"><div id="loading-bar"></div></div>
+        <div id="loading-text">0%</div>
+    </div>
+    <!-- ========================================== -->
+    
+    <!-- ACTIVE THEORY VIRTUAL VIEWPORT TRACK (Hero -> In-Between -> 3D Cards) -->
+    <section id="experience-track" style="position: relative; width: 100%; height: 500vh; background: #05060b;">
+        <div class="viewport-stage" style="position: sticky; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; background: #05060b;">
+            
+            <!-- WebGL Canvas Container -->
+            <div id="canvas-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;"></div>
+
+            <!-- In-Between Synchronized DOM Overlay -->
+            <div id="inbetween-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0; transform: translateY(40px); transition: opacity 0.5s, transform 0.5s;">
+                <div style="text-align: center; max-width: 900px; padding: 60px 20px;">
+                    <div style="color: #00f3ff; font-family: monospace; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 24px;">[ 02 // ARCHIVE EXPLORATION ]</div>
+                    <h2 style="font-family: 'Syne', sans-serif; font-size: clamp(2.2rem, 5vw, 4.2rem); font-weight: 800; color: #ffffff; line-height: 1.1; margin-bottom: 24px; letter-spacing: -0.02em;">
+                        DISCOVER SELECTED WORKS & INTERACTIVE WORLDS
+                    </h2>
+                    <p style="color: rgba(255,255,255,0.6); font-family: monospace; font-size: clamp(0.9rem, 1.5vw, 1.1rem); line-height: 1.7; max-width: 650px; margin: 0 auto 30px;">
+                        Travel through the cyber helix gallery to interact with real-time 3D web applications, GLTF systems, and spatial computing projects.
+                    </p>
+                    <div style="display: inline-flex; align-items: center; gap: 8px; color: #ff00aa; font-family: monospace; font-size: 12px; letter-spacing: 2px;">
+                        <span>SCROLL TO ADVANCE HELIX</span>
+                        <span style="display: inline-block;">↓</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+        <!-- SCENE 3: Carousel Showcase (Pinned) -->
+        <section id="cases" class="showcase-pinned-section">
+            <div class="showcase-sticky-wrapper">
+                <div class="showcase-stage">
+                    
+                    <!-- WebGL 3D Cylinder Carousel Canvas -->
+                    <canvas id="webgl-carousel" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; touch-action: none; cursor: grab;"></canvas>
+
+                    <!-- Active Project Info Block (Below Carousel) -->
+                    <div class="project-details-block">
+                        <div class="ring-scroll-hint">Scroll</div>
+                        <h2 id="active-project-title" class="project-serif-heading">Five Keys</h2>
+                        <p id="active-project-desc" class="project-impact-desc">Designed Five Keys' site appealing to all hospitality sectors.</p>
+                        <div style="margin-top: 10px;">
+                            <a id="active-project-link" href="#five-keys" class="see-more-btn">
+                                <span>SEE MORE</span>
+                                <div class="btn-underline"></div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Side Navigation Buttons -->
+                    <button id="prev-project-btn" class="nav-side-btn prev">Prev</button>
+                    <button id="next-project-btn" class="nav-side-btn next">Next</button>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ABOUT ME: CLEAN & TRADITIONAL              -->
+        <!-- ========================================== -->
+        <section id="about-me" style="background: #0a0515; position: relative; z-index: 10; min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 100px 5%; border-bottom: 1px solid rgba(255,255,255,0.03);">
+        <div style="max-width: 800px; text-align: center;">
+            <div style="color: #00ffcc; font-family: monospace; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px;">About Me</div>
+            
+            <h2 class="project-serif-heading" style="font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.2; margin-bottom: 40px; color: #ede8de;">
+                Hi, I'm a digital designer & developer crafting immersive web experiences.
+            </h2>
+            
+            <p class="project-impact-desc" style="font-size: 1.1rem; line-height: 1.8; color: #888; margin: 0 auto 50px; max-width: 650px;">
+                I specialize in bringing brands to life through interactive WebGL, thoughtful typography, and meticulous UI/UX design. My focus is on building digital spaces that are not just functional, but memorable.
+            </p>
+
+            <a href="mailto:hello@example.com" style="display: inline-block; border: 1px solid rgba(0,255,204,0.4); color: #00ffcc; font-family: monospace; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; padding: 15px 40px; text-decoration: none; border-radius: 4px; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(0,255,204,0.1)'" onmouseout="this.style.background='transparent'">
+                Get In Touch
+            </a>
+        </div>
+    </section>
+    <!-- ========================================== -->
+        
+        <!-- ========================================== -->
+        <!-- EXPERTISE SECTION                          -->
+        <!-- ========================================== -->
+        <style>
+            .expertise-section {
+                background-color: #0a0515;
+                color: #ede8de;
+                padding: 150px 5%;
+                border-bottom: 1px solid rgba(255,255,255,0.03);
+                position: relative;
+                z-index: 10;
+            }
+            .expertise-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
+            @media (min-width: 1024px) {
+                .expertise-container {
+                    grid-template-columns: 400px 1fr;
+                    gap: 100px;
+                }
+            }
+            .expertise-header {
+                position: sticky;
+                top: 150px;
+            }
+            .expertise-eyebrow {
+                color: #00ffcc;
+                font-family: monospace;
+                font-size: 13px;
+                letter-spacing: 3px;
+                text-transform: uppercase;
+                margin-bottom: 30px;
+            }
+            .expertise-desc {
+                font-size: 1.1rem;
+                line-height: 1.8;
+                color: #888;
+                margin-top: 30px;
+            }
+            .expertise-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+            .expertise-card {
+                background: rgba(255,255,255,0.015);
+                border: 1px solid rgba(255,255,255,0.05);
+                border-radius: 12px;
+                padding: 40px;
+                transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+            .expertise-card::before {
+                content: '';
+                position: absolute;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0, 255, 204, 0.04), transparent 40%);
+                opacity: 0;
+                transition: opacity 0.4s;
+                pointer-events: none;
+            }
+            .expertise-card:hover {
+                transform: translateY(-5px);
+                border-color: rgba(0,255,204,0.3);
+                background: rgba(255,255,255,0.03);
+                box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            }
+            .expertise-card:hover::before {
+                opacity: 1;
+            }
+            .expertise-card-num {
+                font-family: monospace;
+                color: rgba(0,255,204,0.5);
+                font-size: 14px;
+                margin-bottom: 20px;
+                display: block;
+            }
+            .expertise-card-title {
+                font-family: 'Playfair Display', serif;
+                font-size: 2rem;
+                color: #ede8de;
+                margin-bottom: 20px;
+                font-weight: 400;
+            }
+            .expertise-card-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: auto;
+            }
+            .expertise-tag {
+                font-family: sans-serif;
+                font-size: 12px;
+                color: #888;
+                padding: 6px 12px;
+                border-radius: 20px;
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.05);
+                transition: all 0.3s;
+            }
+            .expertise-card:hover .expertise-tag {
+                color: #aaa;
+                border-color: rgba(0,255,204,0.2);
+                background: rgba(0,255,204,0.05);
+            }
+        </style>
+
+        <section class="expertise-section">
+            <div class="expertise-container">
+                <!-- Left Side: Header & Intro -->
+                <div>
+                    <div class="expertise-header">
+                        <div class="expertise-eyebrow">/// Capabilities</div>
+                        <h2 class="project-serif-heading" style="font-size: clamp(3rem, 5vw, 4.5rem); line-height: 1.1; margin:0;">
+                            Areas of<br>Expertise
+                        </h2>
+                        <p class="expertise-desc project-impact-desc">
+                            I bridge the gap between technical engineering and high-end aesthetics, delivering robust digital products that don't compromise on design or performance.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Side: Cards Grid -->
+                <div class="expertise-grid" id="expertise-grid">
+                    
+                    <div class="expertise-card">
+                        <span class="expertise-card-num">01.</span>
+                        <h3 class="expertise-card-title">Product Strategy & Discovery</h3>
+                        <p style="color: #777; font-size: 0.95rem; line-height: 1.6; margin-bottom: 30px;">
+                            Defining product vision, user needs, and technical constraints before a single line of code is written to ensure we are solving the right problems.
+                        </p>
+                        <div class="expertise-card-tags">
+                            <span class="expertise-tag">User Research</span>
+                            <span class="expertise-tag">Wireframing</span>
+                            <span class="expertise-tag">Rapid Prototyping</span>
+                            <span class="expertise-tag">Usability Testing</span>
+                        </div>
+                    </div>
+
+                    <div class="expertise-card">
+                        <span class="expertise-card-num">02.</span>
+                        <h3 class="expertise-card-title">UI/UX & Interaction Design</h3>
+                        <p style="color: #777; font-size: 0.95rem; line-height: 1.6; margin-bottom: 30px;">
+                            Crafting intuitive, minimalist, and highly engaging interfaces with a heavy focus on micro-interactions and editorial-quality typography.
+                        </p>
+                        <div class="expertise-card-tags">
+                            <span class="expertise-tag">Visual Design</span>
+                            <span class="expertise-tag">Micro-interactions</span>
+                            <span class="expertise-tag">Motion Graphics</span>
+                            <span class="expertise-tag">3D WebGL</span>
+                        </div>
+                    </div>
+
+                    <div class="expertise-card">
+                        <span class="expertise-card-num">03.</span>
+                        <h3 class="expertise-card-title">Design Systems & Engineering</h3>
+                        <p style="color: #777; font-size: 0.95rem; line-height: 1.6; margin-bottom: 30px;">
+                            Building scalable, modular design systems and translating them into robust, high-performance front-end code architectures.
+                        </p>
+                        <div class="expertise-card-tags">
+                            <span class="expertise-tag">React / Vue</span>
+                            <span class="expertise-tag">Component Libraries</span>
+                            <span class="expertise-tag">Creative Coding</span>
+                            <span class="expertise-tag">Performance Opt</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Hardware-accelerated mouse tracking on cards without layout reflows -->
+        <script>
+            document.querySelectorAll('.expertise-card').forEach(card => {
+                card.addEventListener('pointermove', e => {
+                    card.style.setProperty('--mouse-x', `${e.offsetX}px`);
+                    card.style.setProperty('--mouse-y', `${e.offsetY}px`);
+                }, { passive: true });
+            });
+        </script>
+        <!-- ========================================== -->
+        <!-- MY PROCESS SECTION                         -->
+        <!-- ========================================== -->
+        <section id="my-process" style="background: #0a0515; position: relative; z-index: 10; min-height: 80vh; padding: 100px 5%; border-bottom: 1px solid rgba(255,255,255,0.03);">
+            <div style="max-width: 1200px; margin: 0 auto;">
+                <div style="color: #00ffcc; font-family: monospace; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 50px;">/// Workflow</div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
+                    <!-- Step 1 -->
+                    <div>
+                        <div style="font-family: monospace; color: rgba(255,255,255,0.2); font-size: 3rem; font-weight: bold; margin-bottom: 10px;">01</div>
+                        <h3 class="project-serif-heading" style="font-size: 2rem; color: #ede8de; margin-bottom: 15px;">Briefing</h3>
+                        <p class="project-impact-desc" style="font-size: 0.95rem; line-height: 1.6; color: #777;">
+                            We start by understanding your core objectives, brand identity, and technical requirements. This foundational phase ensures complete alignment before moving forward.
+                        </p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div>
+                        <div style="font-family: monospace; color: rgba(255,255,255,0.2); font-size: 3rem; font-weight: bold; margin-bottom: 10px;">02</div>
+                        <h3 class="project-serif-heading" style="font-size: 2rem; color: #ede8de; margin-bottom: 15px;">Evaluation</h3>
+                        <p class="project-impact-desc" style="font-size: 0.95rem; line-height: 1.6; color: #777;">
+                            Analyzing technical feasibility and designing the architecture. We map out the user journey and construct the interactive scaffolding necessary for the experience.
+                        </p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div>
+                        <div style="font-family: monospace; color: rgba(255,255,255,0.2); font-size: 3rem; font-weight: bold; margin-bottom: 10px;">03</div>
+                        <h3 class="project-serif-heading" style="font-size: 2rem; color: #ede8de; margin-bottom: 15px;">KickOff</h3>
+                        <p class="project-impact-desc" style="font-size: 0.95rem; line-height: 1.6; color: #777;">
+                            Execution phase. This is where WebGL, GSAP, and custom shaders come together to build the final, polished, high-performance digital product.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ========================================== -->
+
+    </div>
+    
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    
+    <!-- Base64 Asset Data Files -->
+    <script src="assets.js"></script>
+    <script src="wood.js"></script>
+    <script src="fuse_hero.js"></script>
+    <script src="left_wp.js"></script>
+    <script src="mid_wp.js"></script>
+    <script src="right_wp.js"></script>
+    <script src="head_glb.js"></script>
+
+    <!-- Main GSAP & UI Logic -->
+    <script>
+        window.addEventListener('load', () => {
+            if (window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+        });
+    </script>
+    <script src="headphones_glb.js"></script>
+    <script src="controller_glb_new.js"></script>
+    <script src="controller2_glb.js"></script>
+    <script src="chair_glb.js"></script>
+    <script src="keyboard_glb.js"></script>
+    <script src="mouse_glb.js"></script>
+    <script src="iphone_glb.js"></script>
+    <script src="picture_frame_glb.js"></script>
+    <script src="frame_collection_glb.js"></script>
+    <script src="pegboard_glb.js"></script>
+    <script src="phone_ui.js"></script>
+    <script src="lunar_logo.js"></script>
+    <script src="vines_glb.js"></script>
+    <script src="project_images.js"></script>
+
+    <script>
+        let iphoneGroupGlobal;
+        const loadingManager = new THREE.LoadingManager();
+        window.loadingManager = loadingManager;
+
+        loadingManager.onProgress = function(url, itemsLoaded, itemsTotal) {
+            const percent = Math.round((itemsLoaded / itemsTotal) * 100);
+            const bar = document.getElementById('loading-bar');
+            const txt = document.getElementById('loading-text');
+            if (bar) bar.style.width = percent + '%';
+            if (txt) txt.innerText = percent + '%';
+        };
+
+        loadingManager.onLoad = function() {
+            const bar = document.getElementById('loading-bar');
+            const txt = document.getElementById('loading-text');
+            if (bar) bar.style.width = '100%';
+            if (txt) txt.innerText = '100%';
+
+            // Pre-compile GPU shader pipelines for instant, stutter-free rendering
+            if (window._heroRenderer && window._heroScene && window._heroCamera) {
+                window._heroRenderer.compile(window._heroScene, window._heroCamera);
+            }
+            if (window._spineRenderer && window._spineScene && window._spineCamera) {
+                window._spineRenderer.compile(window._spineScene, window._spineCamera);
+            }
+            if (window._carouselRenderer && window._carouselScene && window._carouselCamera) {
+                window._carouselRenderer.compile(window._carouselScene, window._carouselCamera);
+            }
+
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loading');
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => { 
+                        loadingScreen.style.display = 'none'; 
+                        if (window.ScrollTrigger) ScrollTrigger.refresh();
+                    }, 500);
+                }
+                if (typeof animate === 'function') animate();
+            }, 300);
+        };
+
+        function initScene() {
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            document.getElementById('loading').innerHTML = '<div style="color:red; font-family:sans-serif; text-align:center;"><h1>ERROR</h1><p>' + msg + ' at line ' + lineNo + '</p></div>';
+            return false;
+        };
+        // 1. SETUP
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0a0515, 0.02);
+
+        const heroGroup = new THREE.Group();
+        scene.add(heroGroup);
+
+        // Native parent routing: All room meshes & lights added during room build go directly into heroGroup
+        const origSceneAdd = scene.add.bind(scene);
+        scene.add = function(...args) {
+            heroGroup.add(...args);
+        };
+
+        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 10000);
+        camera.position.set(1.09, 5.37, 2.00);
+        camera.lookAt(-3.36, 3.80, -4.40);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance", precision: "mediump" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(1.0);
+        renderer.shadowMap.enabled = false;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.15;
+        renderer.domElement.style.touchAction = 'pan-y';
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        window._heroRenderer = renderer;
+        window._heroScene = scene;
+        window._heroCamera = camera;
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enabled = false;
+        controls.target.set(-3.36, 3.80, -4.40);
+        controls.update();
+
+        const textureLoader = new THREE.TextureLoader(loadingManager);
+        const gltfLoader = new THREE.GLTFLoader(loadingManager);
+
+        function base64ToArrayBuffer(base64) {
+            const binaryString = window.atob(base64.split(',')[1] || base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        function loadGlbFromBase64(base64Data, callback) {
+            const itemUrl = 'glb_' + Math.random();
+            loadingManager.itemStart(itemUrl);
+            setTimeout(() => {
+                try {
+                    const buffer = base64ToArrayBuffer(base64Data);
+                    gltfLoader.parse(buffer, '', (gltf) => {
+                        try { callback(gltf); } catch(e) { console.error(e); }
+                        loadingManager.itemEnd(itemUrl);
+                    }, (err) => {
+                        console.error("GLB Parse Error:", err);
+                        loadingManager.itemEnd(itemUrl);
+                    });
+                } catch(e) {
+                    console.error("Base64 Decode Error:", e);
+                    loadingManager.itemEnd(itemUrl);
+                }
+            }, 0);
+        }
+
+        const tWood = typeof texRealWoodBase64 !== 'undefined' ? textureLoader.load(texRealWoodBase64) : null;
+        const tMousepad = typeof texMousepadBase64 !== 'undefined' ? textureLoader.load(texMousepadBase64) : null;
+        const tCarpet = typeof texCarpetBase64 !== 'undefined' ? textureLoader.load(texCarpetBase64) : null;
+        if (tCarpet) { tCarpet.wrapS = THREE.RepeatWrapping; tCarpet.wrapT = THREE.RepeatWrapping; tCarpet.repeat.set(8, 8); }
+        
+        const tWpLeft = typeof texLeftWpBase64 !== 'undefined' ? textureLoader.load(texLeftWpBase64) : null; 
+        if (tWpLeft) { tWpLeft.wrapT = THREE.RepeatWrapping; tWpLeft.repeat.set(1, 0.22); tWpLeft.offset.set(0, 0); }
+
+        const tWpMid = typeof texMidWpBase64 !== 'undefined' ? textureLoader.load(texMidWpBase64) : null;
+        if (tWpMid) { tWpMid.repeat.set(1, 1); tWpMid.offset.set(0, 0); }
+
+        const tWpRight = typeof texRightWpBase64 !== 'undefined' ? textureLoader.load(texRightWpBase64) : null; 
+        if (tWpRight) { tWpRight.wrapT = THREE.RepeatWrapping; tWpRight.repeat.set(1, 0.30); tWpRight.offset.set(0, 0); }
+        
+        const tPoster = typeof texPosterBase64 !== 'undefined' ? textureLoader.load(texPosterBase64) : null;
+
+        // 4. MATERIALS (High-Performance MeshStandardMaterial)
+        const matWallDark = new THREE.MeshStandardMaterial({ color: 0x111b2b, roughness: 0.9 });
+        const matCarpet = new THREE.MeshStandardMaterial({ map: tCarpet, color: 0x9955ff, roughness: 0.9, bumpMap: tCarpet, bumpScale: 0.05 });
+        
+        const tWoodMain = typeof texRealWoodBase64 !== 'undefined' ? textureLoader.load(texRealWoodBase64) : null;
+        if (tWoodMain) {
+            tWoodMain.wrapS = THREE.RepeatWrapping; tWoodMain.wrapT = THREE.RepeatWrapping;
+            tWoodMain.repeat.set(4, 1.25);
+        }
+        const matDeskMain = new THREE.MeshStandardMaterial({ map: tWoodMain, color: 0x8b5a2b, roughness: 0.5, bumpMap: tWoodMain, bumpScale: 0.02 }); 
+        
+        const tWoodL = typeof texRealWoodBase64 !== 'undefined' ? textureLoader.load(texRealWoodBase64) : null;
+        if (tWoodL) {
+            tWoodL.wrapS = THREE.RepeatWrapping; tWoodL.wrapT = THREE.RepeatWrapping;
+            tWoodL.rotation = Math.PI / 2; tWoodL.center.set(0.5, 0.5);
+            tWoodL.repeat.set(3, 1.25);
+        }
+        const matDeskL = new THREE.MeshStandardMaterial({ map: tWoodL, color: 0x8b5a2b, roughness: 0.5, bumpMap: tWoodL, bumpScale: 0.02 }); 
+        const matDeskBlack = matDeskMain;
+
+        const matWhiteFurn = new THREE.MeshStandardMaterial({ color: 0x999999, roughness: 0.9 });
+        const matMetal = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9, roughness: 0.3 });
+        const matSilver = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.9, roughness: 0.2 });
+        const matPlastic = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.8 });
+        const matCloud = new THREE.MeshStandardMaterial({ color: 0xf5f8ff, roughness: 0.95 });
+        const matGeoWall = new THREE.MeshStandardMaterial({ color: 0x5522aa, roughness: 0.8 }); 
+        const matGlass = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.1, roughness: 0.05, opacity: 0.35, transparent: true });
+        const matPlant = new THREE.MeshStandardMaterial({ color: 0x15351a, roughness: 0.7 });
+        const matMat = new THREE.MeshStandardMaterial({ color: 0x020202, roughness: 0.9 });
+        
+        // Emissive materials
+        const matScrnLeft = new THREE.MeshStandardMaterial({ map: tWpLeft, emissiveMap: tWpLeft, emissive: 0xffffff, emissiveIntensity: 1.5, color: 0x000000, roughness: 0.1 });
+        const matScrnMid = new THREE.MeshStandardMaterial({ map: tWpMid, emissiveMap: tWpMid, emissive: 0xffffff, emissiveIntensity: 1.5, color: 0x000000, roughness: 0.1 });
+        const matScrnRight = new THREE.MeshStandardMaterial({ map: tWpRight, emissiveMap: tWpRight, emissive: 0xffffff, emissiveIntensity: 1.5, color: 0x000000, roughness: 0.1 });
+        const matPoster = new THREE.MeshBasicMaterial({ map: tPoster });
+
+        // 5. LIGHTING (Neon Retrowave - Streamlined)
+        scene.add(new THREE.AmbientLight(0x223355, 0.9));
+
+        const mainDirLight = new THREE.DirectionalLight(0xaaddff, 1.2);
+        mainDirLight.position.set(0, 8, 4);
+        scene.add(mainDirLight);
+
+        // Floor Wash (Intense Purple)
+        const floorLight = new THREE.PointLight(0xa200ff, 2.2, 25);
+        floorLight.position.set(-2, 1, 0);
+        scene.add(floorLight);
+
+        // Desk Pink Rim Light (hits the wall panels)
+        const rimLight = new THREE.PointLight(0xff0088, 2.5, 16);
+        rimLight.position.set(-3, 2.5, -4.5); 
+        scene.add(rimLight);
+
+
+        // 6. GEOMETRY CONSTRUCTION
+        const interactableObjects = [];
+
+        // Architecture (Fully Enclosed Room)
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), matCarpet);
+        floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+
+        const wall1 = new THREE.Mesh(new THREE.PlaneGeometry(40, 20), matWallDark); 
+        wall1.position.set(0, 10, -6); wall1.receiveShadow = true; scene.add(wall1);
+
+        const wall2 = new THREE.Mesh(new THREE.PlaneGeometry(40, 20), matWallDark); 
+        wall2.position.set(-8, 10, 0); wall2.rotation.y = Math.PI / 2; wall2.receiveShadow = true; scene.add(wall2);
+        
+        const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), matWallDark);
+        ceiling.position.set(0, 15, 0); ceiling.rotation.x = Math.PI / 2; scene.add(ceiling);
+
+        // Volumetric Fluffy Cloud Ceiling (Instanced Mesh - 1 single GPU draw call, zero overdraw)
+        const cloudGroup = new THREE.Group();
+        cloudGroup.position.set(0, 14.5, -2);
+        const baseCloudGeo = new THREE.SphereGeometry(1.2, 8, 8);
+        const cloudCount = 45;
+        const matCloudOpaque = new THREE.MeshStandardMaterial({ color: 0xf5f8ff, roughness: 0.95 });
+        const cloudInstanced = new THREE.InstancedMesh(baseCloudGeo, matCloudOpaque, cloudCount);
+        const dummyCloud = new THREE.Object3D();
+        for (let i = 0; i < cloudCount; i++) {
+            const size = 1.2 + Math.random() * 1.8;
+            dummyCloud.position.set((Math.random() - 0.5) * 25, (Math.random() - 0.5) * 0.8, (Math.random() - 0.5) * 18);
+            dummyCloud.scale.set(size, size * 0.4, size);
+            dummyCloud.updateMatrix();
+            cloudInstanced.setMatrixAt(i, dummyCloud.matrix);
+        }
+        cloudInstanced.instanceMatrix.needsUpdate = true;
+        cloudGroup.add(cloudInstanced);
+        scene.add(cloudGroup);
+
+        // 3D Faceted Wall Panels (Procedural Vertex Manipulation)
+        const geoPanels = new THREE.Group();
+        // Back Wall Panel
+        const plane1Geo = new THREE.PlaneGeometry(12, 3, 24, 6);
+        const pos1 = plane1Geo.attributes.position;
+        for(let i=0; i<pos1.count; i++) {
+            if (pos1.getY(i) < 1.4 && pos1.getY(i) > -1.4 && pos1.getX(i) > -5.9) {
+                pos1.setZ(i, (Math.random() - 0.5) * 0.7); // Create faceted peaks
+            }
+        }
+        plane1Geo.computeVertexNormals();
+        const panel1 = new THREE.Mesh(plane1Geo, matGeoWall);
+        panel1.position.set(-2, 1.5, -5.9); panel1.receiveShadow = true; panel1.castShadow = true;
+        geoPanels.add(panel1);
+        
+        // Left Wall Panel
+        const plane2Geo = new THREE.PlaneGeometry(8, 3, 16, 6);
+        const pos2 = plane2Geo.attributes.position;
+        for(let i=0; i<pos2.count; i++) {
+            if (pos2.getY(i) < 1.4 && pos2.getY(i) > -1.4) {
+                pos2.setZ(i, (Math.random() - 0.5) * 0.7);
+            }
+        }
+        plane2Geo.computeVertexNormals();
+        const panel2 = new THREE.Mesh(plane2Geo, matGeoWall);
+        panel2.rotation.y = Math.PI / 2;
+        panel2.position.set(-7.9, 1.5, -2); panel2.receiveShadow = true; panel2.castShadow = true;
+        geoPanels.add(panel2);
+        scene.add(geoPanels);
+
+        // L-Shaped Desk
+        const deskGroup = new THREE.Group();
+        const deskMain = new THREE.Mesh(new THREE.BoxGeometry(8, 0.2, 2.5), matDeskMain);
+        deskMain.position.set(1, 2.9, -4); deskMain.castShadow = true; deskMain.receiveShadow = true; deskGroup.add(deskMain);
+        const deskL = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.2, 6.5), matDeskL);
+        deskL.position.set(-4.25, 2.9, -2.0); deskL.castShadow = true; deskL.receiveShadow = true; deskGroup.add(deskL);
+        
+        // White Drawer Unit & Trash Can
+        const drawers = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.9, 2.3), matWhiteFurn);
+        drawers.position.set(4, 1.45, -4); drawers.castShadow = true; deskGroup.add(drawers);
+        for(let i=0; i<4; i++) {
+            const line = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.02, 2.31), matMetal);
+            line.position.set(4, 0.6 + i*0.6, -4); deskGroup.add(line);
+        }
+        // Trashcan — detailed cylindrical model
+        const trashGroup = new THREE.Group();
+        trashGroup.position.set(2.4, 0, -4);
+        deskGroup.add(trashGroup);
+
+        const trashMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.5, metalness: 0.6 });
+        const trashRimMat = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.3, metalness: 0.9 });
+        const trashLinerMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+
+        // Main body — tapered cylinder (wider at top)
+        const trashBody = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.38, 0.30, 1.1, 24, 1, true),
+            trashMat
+        );
+        trashBody.position.y = 0.55;
+        trashGroup.add(trashBody);
+
+        // Bottom cap
+        const trashBottom = new THREE.Mesh(new THREE.CircleGeometry(0.30, 24), trashMat);
+        trashBottom.rotation.x = -Math.PI / 2;
+        trashBottom.position.y = 0.01;
+        trashGroup.add(trashBottom);
+
+        // Inner liner (dark bag visible from top)
+        const trashLiner = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.28, 1.05, 24), trashLinerMat);
+        trashLiner.position.y = 0.55;
+        trashGroup.add(trashLiner);
+
+        // Top rim ring
+        const trashRim = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.03, 8, 24), trashRimMat);
+        trashRim.rotation.x = Math.PI / 2;
+        trashRim.position.y = 1.11;
+        trashGroup.add(trashRim);
+
+        // Vertical ridges around the body for detail
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            const ridge = new THREE.Mesh(
+                new THREE.BoxGeometry(0.03, 1.08, 0.03),
+                trashRimMat
+            );
+            ridge.position.set(Math.cos(angle) * 0.37, 0.55, Math.sin(angle) * 0.37);
+            ridge.rotation.y = -angle;
+            trashGroup.add(ridge);
+        }
+
+        // Handle bar across the top
+        const handleBar = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.72, 12), trashRimMat);
+        handleBar.rotation.z = Math.PI / 2;
+        handleBar.position.y = 1.18;
+        trashGroup.add(handleBar);
+
+        // Metal Legs (Left & Corner)
+        const legGeo = new THREE.CylinderGeometry(0.04, 0.04, 2.9, 16);
+        const leg1 = new THREE.Mesh(legGeo, matMetal); leg1.position.set(-5.3, 1.45, -4.5); deskGroup.add(leg1);
+        const leg2 = new THREE.Mesh(legGeo, matMetal); leg2.position.set(-5.3, 1.45, 1.0); deskGroup.add(leg2);
+        const leg3 = new THREE.Mesh(legGeo, matMetal); leg3.position.set(-3.2, 1.45, 1.0); deskGroup.add(leg3);
+        const leg4 = new THREE.Mesh(legGeo, matMetal); leg4.position.set(-2.8, 1.45, -4.6); deskGroup.add(leg4);
+        scene.add(deskGroup);
+        deskGroup.position.set(-2.5, 0, -0.75); // L-desk flush in corner: back at z=-6, left at x=-8
+
+        // Under-desk LED strips — emissive pink matching reference
+        const matLED = new THREE.MeshBasicMaterial({color: 0xff44bb});
+        // Front edge of deskMain (world z=-3.5, y=2.8, x=-5.5 to 2.5, width=8)
+        const ledFront = new THREE.Mesh(new THREE.BoxGeometry(8.0, 0.04, 0.04), matLED);
+        ledFront.position.set(-1.5, 2.79, -3.5); scene.add(ledFront);
+        const lp1 = new THREE.PointLight(0xff44bb, 1.5, 6); lp1.position.set(-1.5, 2.6, -3.2); scene.add(lp1);
+        // Front edge of deskL (world z=0.5, y=2.8, x=-8 to -5.5, width=2.5)
+        const ledLFront = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.04, 0.04), matLED);
+        ledLFront.position.set(-6.75, 2.79, 0.5); scene.add(ledLFront);
+        const lp2 = new THREE.PointLight(0xff44bb, 0.9, 4); lp2.position.set(-6.75, 2.6, 0.2); scene.add(lp2);
+        // Inner right side of deskL (world x=-5.5, y=2.8, z=-6 to 0.5, depth=6.5)
+        const ledSide = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 6.5), matLED);
+        ledSide.position.set(-5.5, 2.79, -2.75); scene.add(ledSide);
+        const lp3 = new THREE.PointLight(0xff44bb, 0.9, 4); lp3.position.set(-5.2, 2.6, -2.75); scene.add(lp3);
+
+        // Triple Monitor Setup & Ring Lights
+        const scrnGeo = new THREE.BoxGeometry(2.2, 1.24, 0.1);
+        const monitors = new THREE.Group(); monitors.position.set(-2.5, 4.0, -4.95);
+        function makeMonitor(x, z, rotY, mat, addRingLight) {
+            const mGroup = new THREE.Group();
+            mGroup.position.set(x, 0, z); mGroup.rotation.y = rotY;
+            const casing = new THREE.Mesh(scrnGeo, matPlastic); casing.castShadow = true; mGroup.add(casing);
+            const scrn = new THREE.Mesh(new THREE.PlaneGeometry(2.15, 1.19), mat);
+            scrn.position.set(0, 0, 0.06); mGroup.add(scrn);
+            if(addRingLight) {
+                const rArm = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.6, 8), matMetal);
+                rArm.position.set(0, 0.7, -0.1); rArm.rotation.x = Math.PI/6; mGroup.add(rArm);
+                const ring = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.03, 16, 32), new THREE.MeshBasicMaterial({color: 0xffffff}));
+                ring.position.set(0, 1.0, 0); mGroup.add(ring);
+            }
+            return mGroup;
+        }
+        
+        const cMon = makeMonitor(0, 0, 0, matScrnMid, false);
+        const lightBar = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.2), new THREE.MeshStandardMaterial({color: 0x111111}));
+        lightBar.rotation.z = Math.PI/2; lightBar.position.set(0, 0.65, 0.05); cMon.add(lightBar);
+        monitors.add(cMon);
+        
+        monitors.add(makeMonitor(-2.05, 0.55, Math.PI/6, matScrnLeft, true));
+        monitors.add(makeMonitor(2.05, 0.55, -Math.PI/6, matScrnRight, true));
+        
+        // Monitor Arms/Stand
+        const mStand = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.0, 16), matMetal);
+        mStand.position.set(0, -0.5, -0.1); monitors.add(mStand);
+        const mBase = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.05, 0.6), matMetal);
+        mBase.position.set(0, -1.0, -0.1); monitors.add(mBase);
+        scene.add(monitors);
+
+        // Utility deformer for desk accessories (keyboard, wrist rest, etc)
+        const matChairSmooth = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.6, clearcoat: 0.1 });
+        function deformGeometry(geo, deformFunc) {
+            if (geo.isBufferGeometry) {
+                const pos = geo.attributes.position;
+                for(let i=0; i<pos.count; i++) {
+                    let res = deformFunc(pos.getX(i), pos.getY(i), pos.getZ(i));
+                    pos.setXYZ(i, res.x, res.y, res.z);
+                }
+                geo.computeVertexNormals();
+            } else {
+                for(let i=0; i<geo.vertices.length; i++) {
+                    let v = geo.vertices[i];
+                    let res = deformFunc(v.x, v.y, v.z);
+                    v.x = res.x; v.y = res.y; v.z = res.z;
+                }
+                geo.computeFaceNormals(); geo.computeVertexNormals();
+            }
+        }
+
+        // 3D GLB Gaming Chair Model Load (gaming_chair.glb via chairGlbBase64)
+        if (typeof chairGlbBase64 !== 'undefined' && chairGlbBase64.length > 50) {
+            loadGlbFromBase64(chairGlbBase64, (gltf) => {
+                const chairModel = gltf.scene;
+                chairModel.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                const box = new THREE.Box3().setFromObject(chairModel);
+                const size = new THREE.Vector3();
+                box.getSize(size);
+                const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
+                const fitScale = 3.6 / maxDim; // Scaled to fit camera perspective in front of desk
+
+                const chairPivot = new THREE.Group();
+                chairModel.position.set(- (box.min.x + box.max.x) / 2, -box.min.y, - (box.min.z + box.max.z) / 2);
+                chairPivot.add(chairModel);
+                // Scale baked from HUD: 4.35 (normalized: 4.35 / maxDim to match slider units)
+                const normalizedScale = 4.35 / maxDim;
+                chairPivot.scale.set(normalizedScale, normalizedScale, normalizedScale);
+
+                const chairGroup = new THREE.Group();
+                chairGroup.position.set(-3.3, 0.0, -1.95);
+                chairGroup.rotation.y = THREE.MathUtils.degToRad(170);
+                chairGroup.add(chairPivot);
+
+                chairGroup.userData = { isInteractable: true };
+                interactableObjects.push(chairGroup);
+                scene.add(chairGroup);
+
+                // Wire up chair HUD controls
+                window._chairGroup = chairGroup;
+                window._chairPivot = chairPivot;
+            });
+        }
+
+
+        // Desk Accessories & Clutter
+        const mousepad = new THREE.Mesh(new THREE.PlaneGeometry(5.0, 2.0), new THREE.MeshStandardMaterial({ map: tMousepad, roughness: 0.9 }));
+        mousepad.rotation.x = -Math.PI / 2; mousepad.position.set(-3.0, 3.01, -4.55); scene.add(mousepad);
+
+
+        
+        // Global references for live HUD tuning
+        let pegboardGroupGlobal = null;
+        let tableFrameGroupGlobal = null;
+        let cornerShelfFrameGroupGlobal = null;
+        let phoneContainerGroup = null;
+
+        // --- 1. Custom 3D Keyboard GLB (keyboard.glb) ---
+        if (typeof keyboardGlbBase64 !== 'undefined' && keyboardGlbBase64.length > 50) {
+            loadGlbFromBase64(keyboardGlbBase64, (gltf) => {
+                const kbdModel = gltf.scene;
+                kbdModel.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                const kbdBox = new THREE.Box3().setFromObject(kbdModel);
+                const center = new THREE.Vector3();
+                kbdBox.getCenter(center);
+
+                const size = new THREE.Vector3();
+                kbdBox.getSize(size);
+                const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
+                const scale = 1.35 / maxDim;
+
+                const kbdPivot = new THREE.Group();
+                kbdModel.position.set(-center.x, -center.y, -center.z);
+                kbdPivot.add(kbdModel);
+                kbdPivot.scale.set(scale, scale, scale);
+
+                kbdContainerGroup = new THREE.Group();
+                kbdContainerGroup.position.set(-2.70, 3.01, -4.30);
+                kbdContainerGroup.add(kbdPivot);
+                scene.add(kbdContainerGroup);
+                window._kbdContainerGroup = kbdContainerGroup;
+            });
+        } else {
+            // Procedural Keyboard Fallback
+            const kbdGroup = new THREE.Group();
+            kbdGroup.position.set(-2.70, 3.01, -4.30);
+            const kbdBody = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.06, 0.5), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5 }));
+            kbdGroup.add(kbdBody);
+            const kbdRgb = new THREE.Mesh(new THREE.BoxGeometry(1.36, 0.02, 0.46), new THREE.MeshStandardMaterial({ color: 0x00ffcc, emissive: 0x004433 }));
+            kbdRgb.position.y = 0.035; kbdGroup.add(kbdRgb);
+            scene.add(kbdGroup);
+        }
+
+        // --- 2. Custom Ice Claw 3D Gaming Mouse GLB (ice_claw_mouse.glb) ---
+        if (typeof mouseGlbBase64 !== 'undefined' && mouseGlbBase64.length > 50) {
+            loadGlbFromBase64(mouseGlbBase64, (gltf) => {
+                const mouseModel = gltf.scene;
+                mouseModel.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                const mouseBox = new THREE.Box3().setFromObject(mouseModel);
+                const center = new THREE.Vector3();
+                mouseBox.getCenter(center);
+
+                const size = new THREE.Vector3();
+                mouseBox.getSize(size);
+                const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
+                const fitScale = 0.35 / maxDim;
+
+                const mousePivot = new THREE.Group();
+                mouseModel.position.set(-center.x, -center.y, -center.z);
+                mousePivot.add(mouseModel);
+                mousePivot.scale.set(fitScale, fitScale, fitScale);
+
+                mouseContainerGroup = new THREE.Group();
+                mouseContainerGroup.position.set(-1.78, 3.05, -4.30);
+                mouseContainerGroup.rotation.y = THREE.MathUtils.degToRad(-90);
+                mouseContainerGroup.add(mousePivot);
+                scene.add(mouseContainerGroup);
+                window._mouseContainerGroup = mouseContainerGroup;
+            });
+        } else {
+            // Procedural Gaming Mouse Fallback
+            const mouseGroup = new THREE.Group();
+            mouseGroup.position.set(-1.78, 3.05, -4.30);
+            const mouseBody = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.1, 0.38), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.3 }));
+            mouseGroup.add(mouseBody);
+            const mouseRgb = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.03, 0.39), new THREE.MeshStandardMaterial({ color: 0xff00aa, emissive: 0x880055 }));
+            mouseGroup.add(mouseRgb);
+            scene.add(mouseGroup);
+        }
+
+        // Funkos (Under Monitors & Shelves)
+        // Funko POP! Procedural Textures & Materials
+        function createFunkoBoxTexture(color, name, num) {
+            const canvas = document.createElement('canvas'); canvas.width = 256; canvas.height = 256; const ctx = canvas.getContext('2d');
+            ctx.fillStyle = color; ctx.fillRect(0, 0, 256, 256);
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 256, 60);
+            ctx.fillStyle = '#000000'; ctx.font = 'bold 45px Arial'; ctx.fillText('POP!', 10, 48);
+            ctx.beginPath(); ctx.arc(210, 30, 20, 0, Math.PI*2); ctx.fillStyle = '#ffffff'; ctx.fill();
+            ctx.lineWidth = 3; ctx.strokeStyle = '#000000'; ctx.stroke();
+            ctx.fillStyle = '#000000'; ctx.font = 'bold 20px Arial'; ctx.fillText(num, 195, 37);
+            ctx.fillStyle = '#222222'; ctx.fillRect(0, 210, 256, 46);
+            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 22px Arial'; ctx.fillText(name, 10, 240);
+            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 6; ctx.strokeRect(3, 3, 250, 250);
+            const tex = new THREE.CanvasTexture(canvas); tex.anisotropy = 16; return tex;
+        }
+        
+        const tAlpha = new THREE.CanvasTexture((() => {
+            const c = document.createElement('canvas'); c.width = 256; c.height = 256; const ctx = c.getContext('2d');
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 256, 256);
+            ctx.fillStyle = '#000000'; ctx.fillRect(10, 70, 236, 130);
+            return c;
+        })());
+
+        const matPlasticWindow = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+
+        // AoT Materials
+        const matSkin = new THREE.MeshStandardMaterial({ color: 0xffdcb3, roughness: 0.5 });
+        const matHairBrown = new THREE.MeshStandardMaterial({ color: 0x4a3424, roughness: 0.8 });
+        const matHairBlack = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8 });
+        const matHairBlonde = new THREE.MeshStandardMaterial({ color: 0xeadb84, roughness: 0.8 });
+        const matScoutJacket = new THREE.MeshStandardMaterial({ color: 0x937047, roughness: 0.9 });
+        const matScoutCape = new THREE.MeshStandardMaterial({ color: 0x1c4728, roughness: 0.9 });
+        const matShirtWhite = new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.8 });
+        const matPantsWhite = new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.8 });
+        const matBoots = new THREE.MeshStandardMaterial({ color: 0x332211, roughness: 0.6 });
+        const matOdmSilver = new THREE.MeshStandardMaterial({ color: 0xa0a0a0, metalness: 0.8, roughness: 0.3 });
+        const matTitanArmor = new THREE.MeshStandardMaterial({ color: 0xd7c49e, roughness: 0.6 });
+        const matTitanMuscle = new THREE.MeshStandardMaterial({ color: 0x8b1a1a, roughness: 0.8 });
+
+        // Load High-Res Reference Image Textures for Character Faces & Standees
+        const tAoTLevi = textureLoader.load('aot_levi.png');
+        const tAoTEren = textureLoader.load('aot_eren.png');
+        const tAoTHange = textureLoader.load('aot_hange.png');
+        const tAoTTitan = textureLoader.load('aot_titan.png');
+
+        // Master 3D Sculpted Funko Builder
+        function buildSculptedHead(matSkin, faceTex, hairMat, hairStyle) {
+            const headGrp = new THREE.Group();
+            
+            // Classic Funko Pop rounded head — wide oval sphere
+            const headGeo = new THREE.SphereGeometry(0.12, 32, 32);
+            headGeo.applyMatrix4(new THREE.Matrix4().makeScale(1.15, 1.0, 1.0));
+            const headMesh = new THREE.Mesh(headGeo, matSkin); headGrp.add(headMesh);
+
+            // Detailed Anime Face Front Decal
+            const faceMat = new THREE.MeshBasicMaterial({ map: faceTex, transparent: true, depthWrite: false, alphaTest: 0.01 });
+            const facePlane = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.20), faceMat);
+            facePlane.position.set(0, -0.01, 0.121); headGrp.add(facePlane);
+
+            // Hair Sculpting based on character
+            const hairGrp = new THREE.Group();
+            if (hairStyle === 'eren') {
+                // Layered bangs & swooping locks
+                for(let i=0; i<7; i++) {
+                    let lock = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.14, 4), hairMat);
+                    let angle = (i - 3) * 0.25;
+                    lock.rotation.z = angle; lock.rotation.x = 0.3;
+                    lock.position.set(Math.sin(angle)*0.09, 0.08, 0.08 - Math.abs(angle)*0.03);
+                    hairGrp.add(lock);
+                }
+                const topHair = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 16, 0, Math.PI*2, 0, Math.PI/2), hairMat);
+                topHair.scale.set(1.05, 0.7, 1.05); topHair.position.y = 0.05; hairGrp.add(topHair);
+            } else if (hairStyle === 'levi') {
+                // Classic undercut & center-parted curtain bangs
+                const undercut = new THREE.Mesh(new THREE.CylinderGeometry(0.125, 0.13, 0.08, 16), new THREE.MeshStandardMaterial({color: 0x050505}));
+                undercut.position.y = 0.06; hairGrp.add(undercut);
+                for(let i=0; i<6; i++) {
+                    let lock = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.12, 4), hairMat);
+                    let side = i < 3 ? -1 : 1;
+                    let t = (i % 3) * 0.15;
+                    lock.rotation.z = side * (0.3 + t); lock.rotation.x = 0.2;
+                    lock.position.set(side * (0.03 + t*0.4), 0.07, 0.09);
+                    hairGrp.add(lock);
+                }
+            } else if (hairStyle === 'hange') {
+                // Messy ponytail & side bangs + goggles
+                const topHair = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 16), hairMat);
+                topHair.scale.set(1.05, 0.8, 1.05); topHair.position.y = 0.04; hairGrp.add(topHair);
+                const ponytail = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.16, 8), hairMat);
+                ponytail.rotation.x = -1.2; ponytail.position.set(0, 0.02, -0.14); hairGrp.add(ponytail);
+                // Sculpted Goggles
+                const gogFrame = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.04, 0.06), matOdmSilver);
+                gogFrame.position.set(0, 0.06, 0.09); gogFrame.rotation.x = -0.15; hairGrp.add(gogFrame);
+            } else if (hairStyle === 'titan') {
+                // Spiky blonde armor hair
+                for(let i=0; i<12; i++) {
+                    let spike = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.08, 4), hairMat);
+                    let a = (i/12) * Math.PI*2;
+                    spike.position.set(Math.cos(a)*0.1, 0.1, Math.sin(a)*0.09);
+                    spike.rotation.x = Math.sin(a)*0.4; spike.rotation.z = -Math.cos(a)*0.4;
+                    hairGrp.add(spike);
+                }
+            }
+            headGrp.add(hairGrp);
+            return headGrp;
+        }
+
+        // High-Detail Scout Uniform Body with ODM Gear & Action Pose
+        function buildDynamicScoutBody(poseType) {
+            const bodyGrp = new THREE.Group();
+            
+            // Torso & Harness Straps
+            const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.1, 16), matScoutJacket);
+            torso.position.y = 0.08; bodyGrp.add(torso);
+            const shirt = new THREE.Mesh(new THREE.CylinderGeometry(0.041, 0.048, 0.07, 16), matShirtWhite);
+            shirt.position.y = 0.075; bodyGrp.add(shirt);
+
+            // Flowing Green Scout Cape
+            const capeGeo = new THREE.ConeGeometry(0.12, 0.22, 16, 1, true);
+            deformGeometry(capeGeo, (x,y,z) => {
+                let v = (y + 0.11)/0.22;
+                x += Math.sin(v * Math.PI * 2) * 0.03; // Wind ripple effect
+                z -= (v * v) * 0.08; // Flare backward
+                return {x, y, z};
+            });
+            const cape = new THREE.Mesh(capeGeo, matScoutCape);
+            cape.position.set(0, 0.08, -0.02); bodyGrp.add(cape);
+
+            // Legs & Leather Boots
+            const legL = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.015, 0.08), matPantsWhite);
+            const legR = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.015, 0.08), matPantsWhite);
+            legL.position.set(-0.03, 0.02, 0); legR.position.set(0.03, 0.02, 0);
+            bodyGrp.add(legL); bodyGrp.add(legR);
+
+            const bootL = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.04, 0.05), matBoots);
+            const bootR = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.04, 0.05), matBoots);
+            bootL.position.set(-0.03, -0.01, 0.01); bootR.position.set(0.03, -0.01, 0.01);
+            bodyGrp.add(bootL); bodyGrp.add(bootR);
+
+            // Detailed ODM Gear Scabbards & Gas Tanks
+            const odmL = new THREE.Group(); odmL.position.set(-0.065, 0.04, 0);
+            const boxL = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.08, 0.08), matOdmSilver); odmL.add(boxL);
+            const tankL = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.09, 8), matOdmSilver); tankL.rotation.x = Math.PI/2; tankL.position.set(-0.01, 0.02, 0); odmL.add(tankL);
+            bodyGrp.add(odmL);
+
+            const odmR = new THREE.Group(); odmR.position.set(0.065, 0.04, 0);
+            const boxR = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.08, 0.08), matOdmSilver); odmR.add(boxR);
+            const tankR = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.09, 8), matOdmSilver); tankR.rotation.x = Math.PI/2; tankR.position.set(0.01, 0.02, 0); odmR.add(tankR);
+            bodyGrp.add(odmR);
+
+            // Action Poses & Dual Blades
+            const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.08), matScoutJacket);
+            const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.08), matScoutJacket);
+            
+            if (poseType === 'attack') {
+                armL.rotation.z = 1.2; armL.rotation.x = -0.8; armL.position.set(-0.06, 0.09, 0.03);
+                armR.rotation.z = -1.2; armR.rotation.x = -0.8; armR.position.set(0.06, 0.09, 0.03);
+                const blade1 = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.16, 0.02), matOdmSilver); blade1.rotation.x = 1.2; blade1.position.set(-0.08, 0.12, 0.08); bodyGrp.add(blade1);
+                const blade2 = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.16, 0.02), matOdmSilver); blade2.rotation.x = 1.2; blade2.position.set(0.08, 0.12, 0.08); bodyGrp.add(blade2);
+                
+                // Fire/Smoke Effect Base under feet
+                const fireEffect = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.08, 8), new THREE.MeshBasicMaterial({color: 0xff4400, transparent: true, opacity: 0.8}));
+                fireEffect.position.y = -0.03; bodyGrp.add(fireEffect);
+            } else {
+                armL.rotation.z = 0.6; armL.position.set(-0.06, 0.08, 0.01);
+                armR.rotation.z = -0.6; armR.position.set(0.06, 0.08, 0.01);
+            }
+            bodyGrp.add(armL); bodyGrp.add(armR);
+
+            return bodyGrp;
+        }
+
+        // Armored Titan Sculpted Muscle Body
+        function buildArmoredTitanBody() {
+            const bodyGrp = new THREE.Group();
+            
+            // Muscular Torso & Tan Plates
+            const torso = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.14, 0.1), matTitanMuscle); torso.position.y = 0.08; bodyGrp.add(torso);
+            const chestPlate = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.06, 0.11), matTitanArmor); chestPlate.position.set(0, 0.11, 0); bodyGrp.add(chestPlate);
+            const absPlate = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.06, 0.11), matTitanArmor); absPlate.position.set(0, 0.05, 0); bodyGrp.add(absPlate);
+
+            // Heavy Armor Legs
+            const legL = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.08, 0.05), matTitanArmor); legL.position.set(-0.035, 0.02, 0); bodyGrp.add(legL);
+            const legR = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.08, 0.05), matTitanArmor); legR.position.set(0.035, 0.02, 0); bodyGrp.add(legR);
+
+            // Brawny Arms
+            const armL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.12, 0.04), matTitanArmor); armL.position.set(-0.08, 0.08, 0.02); armL.rotation.z = 0.4; bodyGrp.add(armL);
+            const armR = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.12, 0.04), matTitanArmor); armR.position.set(0.08, 0.08, 0.02); armR.rotation.z = -0.4; bodyGrp.add(armR);
+
+            // Steam Swirl Effects at feet
+            for(let i=0; i<6; i++) {
+                let steam = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0.6}));
+                let a = (i/6) * Math.PI*2;
+                steam.position.set(Math.cos(a)*0.08, -0.02, Math.sin(a)*0.08);
+                bodyGrp.add(steam);
+            }
+
+            return bodyGrp;
+        }
+
+        function createErenFigure() {
+            const grp = new THREE.Group();
+            const head = buildSculptedHead(matSkin, tAoTEren, matHairBrown, 'eren'); head.position.y = 0.22; grp.add(head);
+            const body = buildDynamicScoutBody('attack'); grp.add(body);
+            return grp;
+        }
+
+        function createLeviFigure() {
+            const grp = new THREE.Group();
+            const head = buildSculptedHead(matSkin, tAoTLevi, matHairBlack, 'levi'); head.position.y = 0.22; grp.add(head);
+            const body = buildDynamicScoutBody('attack'); grp.add(body);
+            return grp;
+        }
+
+        function createMikasaFigure() {
+            const grp = new THREE.Group();
+            const head = buildSculptedHead(matSkin, tAoTLevi, matHairBlack, 'eren'); head.position.y = 0.22; grp.add(head);
+            const scarf = new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.025, 8, 16), new THREE.MeshStandardMaterial({color: 0x991111, roughness: 0.8}));
+            scarf.rotation.x = Math.PI/2; scarf.position.set(0, 0.11, 0.02); head.add(scarf);
+            const body = buildDynamicScoutBody('normal'); grp.add(body);
+            return grp;
+        }
+
+        function createHangeFigure() {
+            const grp = new THREE.Group();
+            const head = buildSculptedHead(matSkin, tAoTHange, matHairBrown, 'hange'); head.position.y = 0.22; grp.add(head);
+            const body = buildDynamicScoutBody('normal'); grp.add(body);
+            return grp;
+        }
+
+        function createTitanFigure() {
+            const grp = new THREE.Group();
+            const head = buildSculptedHead(matTitanMuscle, tAoTTitan, matHairBlonde, 'titan'); head.position.y = 0.24; grp.add(head);
+            const body = buildArmoredTitanBody(); grp.add(body);
+            return grp;
+        }
+
+        const aotFunkoTypes = [
+            { color: '#2b4c27', name: 'EREN JAEGER', num: '20', builder: createErenFigure },
+            { color: '#1c2833', name: 'LEVI ACKERMAN', num: '21', builder: createLeviFigure },
+            { color: '#881111', name: 'MIKASA ACKERMAN', num: '22', builder: createMikasaFigure },
+            { color: '#5b2c6f', name: 'HANGE ZOE', num: '23', builder: createHangeFigure },
+            { color: '#b9770e', name: 'ARMORED TITAN', num: '24', builder: createTitanFigure }
+        ];
+
+        let funkoCounter = 0;
+        function addFunko(x, y, z, characterIndex = null, rotY = 0) {
+            const index = characterIndex !== null ? characterIndex : (funkoCounter % aotFunkoTypes.length);
+            const data = aotFunkoTypes[index % aotFunkoTypes.length];
+            const tBox = createFunkoBoxTexture(data.color, data.name, data.num);
+            
+            const fGroup = new THREE.Group();
+            fGroup.position.set(x, y + 0.225, z);
+            fGroup.rotation.y = rotY;
+            
+            // DoubleSide on all box materials so interior walls remain 100% visible through window
+            const matBoxSolid = new THREE.MeshStandardMaterial({ map: tBox, roughness: 0.8, side: THREE.DoubleSide });
+            const matBoxWindow = new THREE.MeshStandardMaterial({ map: tBox, alphaMap: tAlpha, transparent: true, alphaTest: 0.2, side: THREE.DoubleSide });
+
+            // 6 faces: +X (Right), -X (Left), +Y (Top), -Y (Bottom), +Z (Front window), -Z (Back)
+            const mats = [
+                matBoxSolid,
+                matBoxSolid,
+                matBoxSolid,
+                matBoxSolid,
+                matBoxWindow,
+                matBoxSolid
+            ];
+            
+            const boxFrame = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.45, 0.25), mats);
+            boxFrame.castShadow = true;
+            boxFrame.receiveShadow = true;
+            fGroup.add(boxFrame);
+
+            // Inner Cardboard Backdrop Insert
+            const matInsert = new THREE.MeshBasicMaterial({ color: parseInt(data.color.replace('#','0x')), side: THREE.DoubleSide });
+            const insertBack = new THREE.Mesh(new THREE.PlaneGeometry(0.28, 0.43), matInsert);
+            insertBack.position.set(0, 0, -0.12);
+            fGroup.add(insertBack);
+
+            // Acrylic Window Pane over front window cutout
+            const windowPane = new THREE.Mesh(
+                new THREE.PlaneGeometry(0.24, 0.3),
+                new THREE.MeshStandardMaterial({ color: 0xffffff, opacity: 0.3, transparent: true, roughness: 0.1, side: THREE.DoubleSide })
+            );
+            windowPane.position.set(0, -0.02, 0.126);
+            fGroup.add(windowPane);
+
+            // INSIDE DISPLAY WINDOW: 3D AOT FUNKO POP FIGURE!
+            if (data.builder) {
+                const figure = data.builder();
+                figure.scale.set(0.72, 0.72, 0.72);
+                figure.position.set(0, -0.14, 0);
+                fGroup.add(figure);
+            }
+
+            scene.add(fGroup);
+            funkoCounter++;
+        }
+        function addErenFunko(x, y, z) {
+            const grp = createErenFigure(); grp.position.set(x, y, z); grp.rotation.y = -0.2;
+            grp.traverse(c => { if(c.isMesh) c.castShadow = true; }); scene.add(grp);
+        }
+        function addLeviFunko(x, y, z) {
+            const grp = createLeviFigure(); grp.position.set(x, y, z); grp.rotation.y = 0.3;
+            grp.traverse(c => { if(c.isMesh) c.castShadow = true; }); scene.add(grp);
+        }
+        function addHangeFunko(x, y, z) {
+            const grp = createHangeFigure(); grp.position.set(x, y, z); grp.rotation.y = -0.4;
+            grp.traverse(c => { if(c.isMesh) c.castShadow = true; }); scene.add(grp);
+        }
+        function addTitanFunko(x, y, z) {
+            const grp = createTitanFigure(); grp.position.set(x, y, z); grp.rotation.y = 0.1;
+            grp.traverse(c => { if(c.isMesh) c.castShadow = true; }); scene.add(grp);
+        }
+
+        // Add 3D Funko Pop figures in front of monitors (z=-3.65)
+        addErenFunko(-4.8, 3.0, -3.65);
+        addLeviFunko(-4.2, 3.0, -3.65);
+        addHangeFunko(-0.8, 3.0, -3.65);
+        addTitanFunko(-0.2, 3.0, -3.65);
+
+        // Pegboard & Left Wall Decor — 3D GLB IKEA Pegboard (ikea_pegboard.glb)
+        const pegboardGroup = new THREE.Group();
+        pegboardGroup.position.set(-7.8, 5.2, -0.1);
+        pegboardGroup.rotation.set(THREE.MathUtils.degToRad(90), 0, 0);
+        pegboardGroup.scale.set(1.0, 1.0, 1.0);
+        scene.add(pegboardGroup);
+        pegboardGroupGlobal = pegboardGroup;
+
+        if (typeof pegboardGlbBase64 !== 'undefined' && pegboardGlbBase64.length > 50) {
+            loadGlbFromBase64(pegboardGlbBase64, (gltf) => {
+                const pbModel = gltf.scene;
+                pbModel.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                pbModel.updateMatrixWorld(true);
+                const pbBox = new THREE.Box3().setFromObject(pbModel);
+                const center = new THREE.Vector3();
+                pbBox.getCenter(center);
+
+                const size = new THREE.Vector3();
+                pbBox.getSize(size);
+                const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
+                const fitScale = 2.4 / maxDim; // ~2.4m tall pegboard on left wall
+
+                const pbPivot = new THREE.Group();
+                pbModel.position.set(-center.x, -center.y, -center.z);
+                pbPivot.add(pbModel);
+                pbPivot.scale.set(0.65 * 0.1, 0.65 * 1.0, 0.65 * 0.8);
+
+                pegboardGroup.add(pbPivot);
+                window._pbPivot = pbPivot;
+            });
+        } else {
+            // High-Fidelity Dark Pegboard (Matches Reference Screenshot)
+            const pbBoardMat = new THREE.MeshStandardMaterial({ color: 0x151522, roughness: 0.6 });
+            const pbHoleMat = new THREE.MeshBasicMaterial({ color: 0xe0e0e0 });
+            const pbFrameMat = new THREE.MeshStandardMaterial({ color: 0x2a2a38, roughness: 0.5 });
+            
+            const pbBoard = new THREE.Mesh(new THREE.BoxGeometry(0.04, 2.6, 1.8), pbBoardMat);
+            pegboardGroup.add(pbBoard);
+            
+            const frameTop = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 1.84), pbFrameMat);
+            frameTop.position.set(0, 1.31, 0); pegboardGroup.add(frameTop);
+            const frameBottom = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 1.84), pbFrameMat);
+            frameBottom.position.set(0, -1.31, 0); pegboardGroup.add(frameBottom);
+            const frameLeft = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.68, 0.06), pbFrameMat);
+            frameLeft.position.set(0, 0, -0.92); pegboardGroup.add(frameLeft);
+            const frameRight = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.68, 0.06), pbFrameMat);
+            frameRight.position.set(0, 0, 0.92); pegboardGroup.add(frameRight);
+            
+            for(let hy = -1.1; hy <= 1.1; hy += 0.18) {
+                for(let hz = -0.75; hz <= 0.75; hz += 0.18) {
+                    const hole = new THREE.Mesh(new THREE.CircleGeometry(0.018, 12), pbHoleMat);
+                    hole.rotation.y = Math.PI / 2;
+                    hole.position.set(0.021, hy, hz);
+                    pegboardGroup.add(hole);
+                }
+            }
+        }
+
+        // --- GLTF HD MODELS LOAD (Base64 Parsed for file:// protocol compatibility) ---
+        let hpContainerGroup = null;
+        let hpInnerModel = null;
+        let hpOriginalGeoMap = new Map();
+        let iphoneGroupGlobal = null;
+
+        // 1. Mannequin Head (Opaque Grey Silicone) on Left Desk + Headphones on Head
+        if (typeof headGlbBase64 !== 'undefined') {
+            loadGlbFromBase64(headGlbBase64, (gltf) => {
+                const headModel = gltf.scene;
+
+                const headMat = new THREE.MeshStandardMaterial({
+                    color: 0x667788,
+                    roughness: 0.18,
+                    metalness: 0.0,
+                    transparent: false,
+                    opacity: 1.0,
+                    ior: 1.48,
+                    thickness: 0.8,
+                    clearcoat: 1.0,
+                    clearcoatRoughness: 0.1
+                });
+
+                headModel.traverse((child) => {
+                    if (child.isMesh) {
+                        child.material = headMat;
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                const box = new THREE.Box3().setFromObject(headModel);
+                const size = new THREE.Vector3();
+                box.getSize(size);
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const targetHeight = 1.05;
+                const scaleFactor = targetHeight / maxDim;
+                headModel.scale.set(scaleFactor * 0.95, scaleFactor * 0.95, scaleFactor * 0.95);
+
+                const scaledBox = new THREE.Box3().setFromObject(headModel);
+                headModel.position.y = -scaledBox.min.y;
+
+                const headContainer = new THREE.Group();
+                headContainer.position.set(-6.2, 3.0, -1.5);
+                headContainer.rotation.y = Math.PI * 0.65;
+                headContainer.add(headModel);
+                window.headContainerGlobal = headContainer;
+
+                // Load headphones GLB and place on the head
+                if (typeof headphonesGlbBase64 !== 'undefined') {
+                    loadGlbFromBase64(headphonesGlbBase64, (hpGltf) => {
+                        const hpModel = hpGltf.scene;
+                        window.hpInnerModel = hpModel;
+                        window.hpOriginalGeoMap = new Map();
+
+                        hpModel.traverse((child) => {
+                            if (child.isMesh) {
+                                const name = (child.name || '').toLowerCase();
+                                // Remove / hide hanging cable cord meshes safely without breaking earcups or headband
+                                if (name.includes('cable') || name.includes('cord') || name.includes('wire') || name.includes('jack') || name.includes('lead') || name.includes('line') || name.includes('plug')) {
+                                    child.visible = false;
+                                }
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                                if (child.geometry && child.geometry.attributes.position) {
+                                    const pos = child.geometry.attributes.position;
+                                    window.hpOriginalGeoMap.set(child.id, Float32Array.from(pos.array));
+                                }
+                            }
+                        });
+
+                        // Center inner model
+                        let hpBox = new THREE.Box3().setFromObject(hpModel);
+                        const hpCenter = new THREE.Vector3();
+                        hpBox.getCenter(hpCenter);
+                        hpModel.position.sub(hpCenter);
+
+                        // Scale headphones to match mannequin head proportion
+                        const hpSize = new THREE.Vector3();
+                        hpBox.getSize(hpSize);
+                        const hpMaxDim = Math.max(hpSize.x, hpSize.y, hpSize.z);
+                        const baseSF = 1.05 / hpMaxDim;
+                        hpModel.scale.set(baseSF, baseSF, baseSF);
+
+                        hpContainerGroup = new THREE.Group();
+                        hpContainerGroup.position.set(-0.01, 0.43, 0.22);
+                        hpContainerGroup.add(hpModel);
+                        window.hpContainerGlobal = hpContainerGroup;
+
+                        headContainer.add(hpContainerGroup);
+
+                        if (window.updateHeadphones) window.updateHeadphones();
+                    });
+                }
+
+                scene.add(headContainer);
+            });
+        }
+
+        // --- PEGBOARD MOUNTED ACCESSORIES GROUP (Stationary Wall Items) ---
+        // Contains all items mounted on the wall (Xbox Controllers, S-hooks, Sticky Notes, Funkos)
+        // so that rotating/moving the pegboard board individually via the HUD does not affect them!
+        const pegboardItemsGroup = new THREE.Group();
+        pegboardItemsGroup.position.set(-7.80, 5.2, -0.05);
+        pegboardItemsGroup.rotation.y = Math.PI / 2;
+        scene.add(pegboardItemsGroup);
+
+        // 1. Upper White Xbox Controller
+        if (typeof controllerGlbBase64 !== 'undefined') {
+            loadGlbFromBase64(controllerGlbBase64, (gltf) => {
+                const model = gltf.scene;
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+                let box = new THREE.Box3().setFromObject(model);
+                let size = new THREE.Vector3();
+                box.getSize(size);
+                const sf = 0.42 / Math.max(size.x, size.y, size.z);
+                model.scale.set(sf, sf, sf);
+
+                box.setFromObject(model);
+                const center = new THREE.Vector3();
+                box.getCenter(center);
+                model.position.sub(center);
+
+                const ctrl1 = new THREE.Group();
+                ctrl1.position.set(0.00, -0.12, 0.07);
+                ctrl1.rotation.set(THREE.MathUtils.degToRad(45), 0, 0);
+                ctrl1.add(model);
+                pegboardItemsGroup.add(ctrl1);
+            });
+        }
+
+        // 2. Lower White & Green Xbox Controller
+        if (typeof controller2GlbBase64 !== 'undefined') {
+            loadGlbFromBase64(controller2GlbBase64, (gltf) => {
+                const model = gltf.scene;
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+                let box = new THREE.Box3().setFromObject(model);
+                let size = new THREE.Vector3();
+                box.getSize(size);
+                const sf = 0.42 / Math.max(size.x, size.y, size.z);
+                model.scale.set(sf, sf, sf);
+
+                box.setFromObject(model);
+                const center = new THREE.Vector3();
+                box.getCenter(center);
+                model.position.sub(center);
+
+                const ctrl2 = new THREE.Group();
+                ctrl2.position.set(0.00, -0.53, 0.07);
+                ctrl2.rotation.set(0, 0, 0);
+                ctrl2.add(model);
+                pegboardItemsGroup.add(ctrl2);
+            });
+        }
+
+        // 3. S-hooks
+        const hookMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.9, roughness: 0.2 });
+        [0.1, 0.55].forEach(hx => {
+            const hook = new THREE.Mesh(new THREE.TorusGeometry(0.03, 0.01, 8, 16, Math.PI), hookMat);
+            hook.position.set(hx, 0.6, 0.07); hook.rotation.z = Math.PI;
+            pegboardItemsGroup.add(hook);
+        });
+
+        // 4. Sticky notes
+        const noteColors2 = [0xffee77, 0xff9999, 0xaaffaa];
+        [[0.3, 0.55], [0.6, -0.1], [-0.2, -0.3]].forEach(([nx, ny], i) => {
+            const note = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.01), new THREE.MeshBasicMaterial({ color: noteColors2[i] }));
+            note.position.set(nx, ny, 0.03);
+            pegboardItemsGroup.add(note);
+        });
+
+        // 5. Funko Pops on pegboard shelf
+        addFunko(-7.75, 5.72, -0.35, 0, Math.PI/2);
+        addFunko(-7.75, 5.72,  0.0,  1, Math.PI/2);
+        addFunko(-7.75, 5.72,  0.35, 2, Math.PI/2);
+
+        // 3D iPhone on minimal beige stand based on reference image
+        function createIPhoneStand(x, y, z, rotY = 72) {
+            const pGroup = new THREE.Group();
+            pGroup.position.set(x, y, z);
+            pGroup.rotation.y = THREE.MathUtils.degToRad(rotY);
+            iphoneGroupGlobal = pGroup;
+
+            const standMat = new THREE.MeshStandardMaterial({ color: 0xede8de, roughness: 0.5, clearcoat: 0.2 });
+            const baseFoot = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.04, 0.42), standMat);
+            baseFoot.position.set(0, 0.02, 0); pGroup.add(baseFoot);
+
+            const frontLip = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.36, 16), standMat);
+            frontLip.rotation.z = Math.PI / 2; frontLip.position.set(0, 0.05, 0.18); pGroup.add(frontLip);
+
+            const backRest = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.55, 0.03), standMat);
+            backRest.rotation.x = -Math.PI / 10; backRest.position.set(0, 0.28, -0.05); pGroup.add(backRest);
+
+            // Load new iPhone 16 3D GLB model onto the stand (swapping phone model while keeping stand)
+            if (typeof iphoneGlbBase64 !== 'undefined') {
+                loadGlbFromBase64(iphoneGlbBase64, (gltf) => {
+                    const phoneModel = gltf.scene;
+                    phoneModel.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+
+                    let box = new THREE.Box3().setFromObject(phoneModel);
+                    const center = new THREE.Vector3();
+                    box.getCenter(center);
+                    phoneModel.position.sub(center);
+
+                    const size = new THREE.Vector3();
+                    box.getSize(size);
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const scale = 0.72 / maxDim;
+                    phoneModel.scale.set(scale, scale, scale);
+
+                    phoneContainerGroup = new THREE.Group();
+                    phoneContainerGroup.rotation.x = -Math.PI / 10;
+                    phoneContainerGroup.position.set(0, 0.32, -0.20);
+                    phoneContainerGroup.add(phoneModel);
+                    pGroup.add(phoneContainerGroup);
+                });
+            }
+
+            scene.add(pGroup);
+        }
+
+        // Live Room Elements Tuner Listener Setup (Safe with fallback defaults)
+        function setupPeripheralsTuningHUD() {
+            const bindPair = (numId, rngId, updateFn) => {
+                const num = document.getElementById(numId);
+                const rng = document.getElementById(rngId);
+                if (!num || !rng) return;
+                num.addEventListener('input', () => {
+                    rng.value = num.value;
+                    updateFn();
+                });
+                rng.addEventListener('input', () => {
+                    num.value = rng.value;
+                    updateFn();
+                });
+            };
+
+            const defaults = {
+                ip_px_num: -6.41, ip_py_num: 3.01, ip_pz_num: -3.8, ip_rx_num: 0, ip_ry_num: 54, ip_rz_num: 0,
+                ch_px_num: -3.3, ch_py_num: 0.0, ch_pz_num: -1.95, ch_ry_num: 170, ch_sc_num: 4.35,
+                tf_px_num: -6.85, tf_py_num: 3.55, tf_pz_num: -0.15, tf_ry_num: 129, tf_sc_num: 1.0,
+                cf_px_num: -7.4, cf_py_num: 7.5, cf_pz_num: -5.6, cf_ry_num: 40, cf_sc_num: 1.0,
+                bsf_px_num: -3.85, bsf_py_num: 7.35, bsf_pz_num: -5.55, bsf_rx_num: 0, bsf_ry_num: 0, bsf_rz_num: 0, bsf_sc_num: 1.25,
+                wf_px_num: -7.95, wf_py_num: 5.15, wf_pz_num: -3.06, wf_rx_num: 0, wf_ry_num: 90, wf_rz_num: 0, wf_sc_num: 1.0,
+                pb_px_num: -7.8, pb_py_num: 5.2, pb_pz_num: -0.1, pb_rx_num: 90, pb_ry_num: 0, pb_su_num: 0.65, pb_sw_num: 0.1, pb_sh_num: 1.0, pb_sc_num: 0.8,
+                hd_px_num: -6.2, hd_py_num: 3.0, hd_pz_num: -1.5, hd_ry_num: 117, hd_sc_num: 1.0,
+                hp_px_num: -0.01, hp_py_num: 0.43, hp_pz_num: 0.22, hp_ry_num: 0, hp_sc_num: 1.5, hp_gap_num: 1.0,
+                sn_px_num: -6.4, sn_py_num: 6.85, sn_pz_num: -5.65, sn_ry_num: 225, sn_sc_num: 1.0,
+                kb_px_num: -2.70, kb_py_num: 3.01, kb_pz_num: -4.30, kb_ry_num: 0, kb_sc_num: 1.35,
+                ms_px_num: -1.78, ms_py_num: 3.05, ms_pz_num: -4.30, ms_ry_num: -90, ms_sc_num: 0.35
+            };
+            const getVal = (id) => {
+                const el = document.getElementById(id);
+                if (el) return parseFloat(el.value) || 0;
+                return defaults[id] !== undefined ? defaults[id] : 0;
+            };
+
+            const updateBackShelfFrame = () => {
+                if (!backShelfFrameGroupGlobal) return;
+                backShelfFrameGroupGlobal.position.set(getVal('bsf_px_num'), getVal('bsf_py_num'), getVal('bsf_pz_num'));
+                backShelfFrameGroupGlobal.rotation.set(
+                    THREE.MathUtils.degToRad(getVal('bsf_rx_num')),
+                    THREE.MathUtils.degToRad(getVal('bsf_ry_num')),
+                    THREE.MathUtils.degToRad(getVal('bsf_rz_num'))
+                );
+                const sc = getVal('bsf_sc_num');
+                backShelfFrameGroupGlobal.scale.set(sc, sc, sc);
+            };
+
+            const updateIPhone = () => {
+                if (!iphoneGroupGlobal) return;
+                iphoneGroupGlobal.position.set(getVal('ip_px_num'), getVal('ip_py_num'), getVal('ip_pz_num'));
+                iphoneGroupGlobal.rotation.set(
+                    THREE.MathUtils.degToRad(getVal('ip_rx_num')),
+                    THREE.MathUtils.degToRad(getVal('ip_ry_num')),
+                    THREE.MathUtils.degToRad(getVal('ip_rz_num'))
+                );
+            };
+
+            const updateWallFrame = () => {
+                if (!wallFrameGroupGlobal) return;
+                wallFrameGroupGlobal.position.set(getVal('wf_px_num'), getVal('wf_py_num'), getVal('wf_pz_num'));
+                wallFrameGroupGlobal.rotation.set(
+                    THREE.MathUtils.degToRad(getVal('wf_rx_num')),
+                    THREE.MathUtils.degToRad(getVal('wf_ry_num')),
+                    THREE.MathUtils.degToRad(getVal('wf_rz_num'))
+                );
+                const sc = getVal('wf_sc_num');
+                wallFrameGroupGlobal.scale.set(sc, sc, sc);
+            };
+
+            // Table Frame
+            const updateTableFrame = () => {
+                if (!tableFrameGroupGlobal) return;
+                tableFrameGroupGlobal.position.set(getVal('tf_px_num'), getVal('tf_py_num'), getVal('tf_pz_num'));
+                tableFrameGroupGlobal.rotation.y = THREE.MathUtils.degToRad(getVal('tf_ry_num'));
+                const sc = getVal('tf_sc_num'); tableFrameGroupGlobal.scale.set(sc, sc, sc);
+                console.log('Table Frame pos:', tableFrameGroupGlobal.position);
+            };
+            bindPair('tf_px_num','tf_px_rng', updateTableFrame);
+            bindPair('tf_py_num','tf_py_rng', updateTableFrame);
+            bindPair('tf_pz_num','tf_pz_rng', updateTableFrame);
+            bindPair('tf_ry_num','tf_ry_rng', updateTableFrame);
+            bindPair('tf_sc_num','tf_sc_rng', updateTableFrame);
+
+            // Corner Frame
+            const updateCornerFrame = () => {
+                if (!cornerShelfFrameGroupGlobal) return;
+                cornerShelfFrameGroupGlobal.position.set(getVal('cf_px_num'), getVal('cf_py_num'), getVal('cf_pz_num'));
+                cornerShelfFrameGroupGlobal.rotation.y = THREE.MathUtils.degToRad(getVal('cf_ry_num'));
+                const sc = getVal('cf_sc_num'); cornerShelfFrameGroupGlobal.scale.set(sc, sc, sc);
+                console.log('Corner Frame pos:', cornerShelfFrameGroupGlobal.position);
+            };
+            bindPair('cf_px_num','cf_px_rng', updateCornerFrame);
+            bindPair('cf_py_num','cf_py_rng', updateCornerFrame);
+            bindPair('cf_pz_num','cf_pz_rng', updateCornerFrame);
+            bindPair('cf_ry_num','cf_ry_rng', updateCornerFrame);
+            bindPair('cf_sc_num','cf_sc_rng', updateCornerFrame);
+
+            bindPair('bsf_px_num', 'bsf_px_rng', updateBackShelfFrame);
+            bindPair('bsf_py_num', 'bsf_py_rng', updateBackShelfFrame);
+            bindPair('bsf_pz_num', 'bsf_pz_rng', updateBackShelfFrame);
+            bindPair('bsf_rx_num', 'bsf_rx_rng', updateBackShelfFrame);
+            bindPair('bsf_ry_num', 'bsf_ry_rng', updateBackShelfFrame);
+            bindPair('bsf_rz_num', 'bsf_rz_rng', updateBackShelfFrame);
+            bindPair('bsf_sc_num', 'bsf_sc_rng', updateBackShelfFrame);
+
+            bindPair('wf_px_num', 'wf_px_rng', updateWallFrame);
+            bindPair('wf_py_num', 'wf_py_rng', updateWallFrame);
+            bindPair('wf_pz_num', 'wf_pz_rng', updateWallFrame);
+            bindPair('wf_rx_num', 'wf_rx_rng', updateWallFrame);
+            bindPair('wf_ry_num', 'wf_ry_rng', updateWallFrame);
+            bindPair('wf_rz_num', 'wf_rz_rng', updateWallFrame);
+            bindPair('wf_sc_num', 'wf_sc_rng', updateWallFrame);
+
+            // Pegboard controls
+            const updatePegboard = () => {
+                const pg = pegboardGroupGlobal;
+                if (!pg) return;
+                pg.position.set(getVal('pb_px_num'), getVal('pb_py_num'), getVal('pb_pz_num'));
+                pg.rotation.x = THREE.MathUtils.degToRad(getVal('pb_rx_num'));
+                pg.rotation.y = THREE.MathUtils.degToRad(getVal('pb_ry_num'));
+                const su = getVal('pb_su_num');
+                const sw = getVal('pb_sw_num');
+                const sh = getVal('pb_sh_num');
+                const sd = getVal('pb_sc_num');
+                const target = window._pbPivot || pg;
+                target.scale.set(su * sw, su * sh, su * sd);
+                console.log('Pegboard scale:', su * sw, su * sh, su * sd);
+            };
+            bindPair('pb_px_num','pb_px_rng', updatePegboard);
+            bindPair('pb_py_num','pb_py_rng', updatePegboard);
+            bindPair('pb_pz_num','pb_pz_rng', updatePegboard);
+            bindPair('pb_rx_num','pb_rx_rng', updatePegboard);
+            bindPair('pb_ry_num','pb_ry_rng', updatePegboard);
+            bindPair('pb_su_num','pb_su_rng', updatePegboard);
+            bindPair('pb_sw_num','pb_sw_rng', updatePegboard);
+            bindPair('pb_sh_num','pb_sh_rng', updatePegboard);
+            bindPair('pb_sc_num','pb_sc_rng', updatePegboard);
+
+            bindPair('ip_px_num', 'ip_px_rng', updateIPhone);
+            bindPair('ip_py_num', 'ip_py_rng', updateIPhone);
+            bindPair('ip_pz_num', 'ip_pz_rng', updateIPhone);
+            bindPair('ip_rx_num', 'ip_rx_rng', updateIPhone);
+            bindPair('ip_ry_num', 'ip_ry_rng', updateIPhone);
+            bindPair('ip_rz_num', 'ip_rz_rng', updateIPhone);
+
+            // Mannequin Head controls
+            const updateHead = () => {
+                const hd = window.headContainerGlobal;
+                if (!hd) return;
+                hd.position.set(getVal('hd_px_num'), getVal('hd_py_num'), getVal('hd_pz_num'));
+                hd.rotation.y = THREE.MathUtils.degToRad(getVal('hd_ry_num'));
+                const sc = getVal('hd_sc_num');
+                hd.scale.set(sc, sc, sc);
+            };
+            bindPair('hd_px_num', 'hd_px_rng', updateHead);
+            bindPair('hd_py_num', 'hd_py_rng', updateHead);
+            bindPair('hd_pz_num', 'hd_pz_rng', updateHead);
+            bindPair('hd_ry_num', 'hd_ry_rng', updateHead);
+            bindPair('hd_sc_num', 'hd_sc_rng', updateHead);
+
+            // Headphones controls (with true non-distorting Cuff Gap spreading)
+            const updateHeadphones = () => {
+                const hp = window.hpContainerGlobal;
+                if (!hp) return;
+                hp.position.set(getVal('hp_px_num'), getVal('hp_py_num'), getVal('hp_pz_num'));
+                hp.rotation.y = THREE.MathUtils.degToRad(getVal('hp_ry_num'));
+                const sc = getVal('hp_sc_num');
+                hp.scale.set(sc, sc, sc);
+
+                const gap = getVal('hp_gap_num');
+                const innerModel = window.hpInnerModel;
+                const geoMap = window.hpOriginalGeoMap;
+
+                if (innerModel && geoMap) {
+                    innerModel.traverse((child) => {
+                        if (child.isMesh && child.geometry && child.geometry.attributes.position) {
+                            const orig = geoMap.get(child.id);
+                            if (!orig) return;
+                            const posAttr = child.geometry.attributes.position;
+                            const arr = posAttr.array;
+                            for (let i = 0; i < orig.length; i += 3) {
+                                let x = orig[i];
+                                let y = orig[i+1];
+                                let z = orig[i+2];
+
+                                // Flex headband near top (y > 0.1) while spreading ear cups along X and Z
+                                let flex = (y > 0.1) ? Math.max(0, 1.0 - (y - 0.1) * 2.0) : 1.0;
+                                let shiftX = (x > 0.001) ? gap * 0.08 : (x < -0.001) ? -gap * 0.08 : 0;
+                                let shiftZ = (z > 0.001) ? gap * 0.08 : (z < -0.001) ? -gap * 0.08 : 0;
+
+                                arr[i]     = x + shiftX * flex;
+                                arr[i+1]   = y;
+                                arr[i+2]   = z + shiftZ * flex;
+                            }
+                            posAttr.needsUpdate = true;
+                        }
+                    });
+                }
+            };
+            window.updateHeadphones = updateHeadphones;
+            bindPair('hp_px_num', 'hp_px_rng', updateHeadphones);
+            bindPair('hp_py_num', 'hp_py_rng', updateHeadphones);
+            bindPair('hp_pz_num', 'hp_pz_rng', updateHeadphones);
+            bindPair('hp_ry_num', 'hp_ry_rng', updateHeadphones);
+            bindPair('hp_sc_num', 'hp_sc_rng', updateHeadphones);
+            bindPair('hp_gap_num', 'hp_gap_rng', updateHeadphones);
+
+            // Shelf Figure (Son) controls
+            const updateSonFigure = () => {
+                const sn = window.sonFigureGroupGlobal;
+                if (!sn) return;
+                sn.position.set(getVal('sn_px_num'), getVal('sn_py_num'), getVal('sn_pz_num'));
+                sn.rotation.y = THREE.MathUtils.degToRad(getVal('sn_ry_num'));
+                const sc = getVal('sn_sc_num');
+                sn.scale.set(sc, sc, sc);
+            };
+            bindPair('sn_px_num', 'sn_px_rng', updateSonFigure);
+            bindPair('sn_py_num', 'sn_py_rng', updateSonFigure);
+            bindPair('sn_pz_num', 'sn_pz_rng', updateSonFigure);
+            bindPair('sn_ry_num', 'sn_ry_rng', updateSonFigure);
+            bindPair('sn_sc_num', 'sn_sc_rng', updateSonFigure);
+
+            // Keyboard controls
+            const updateKeyboard = () => {
+                const kb = window._kbdContainerGroup;
+                if (!kb) return;
+                kb.position.set(getVal('kb_px_num'), getVal('kb_py_num'), getVal('kb_pz_num'));
+                kb.rotation.y = THREE.MathUtils.degToRad(getVal('kb_ry_num'));
+                const sc = getVal('kb_sc_num');
+                // Scale applies to the pivot child (first child) to re-fit the model
+                if (kb.children[0]) kb.children[0].scale.set(sc, sc, sc);
+            };
+            bindPair('kb_px_num', 'kb_px_rng', updateKeyboard);
+            bindPair('kb_py_num', 'kb_py_rng', updateKeyboard);
+            bindPair('kb_pz_num', 'kb_pz_rng', updateKeyboard);
+            bindPair('kb_ry_num', 'kb_ry_rng', updateKeyboard);
+            bindPair('kb_sc_num', 'kb_sc_rng', updateKeyboard);
+
+            // Mouse controls
+            const updateMouse = () => {
+                const ms = window._mouseContainerGroup;
+                if (!ms) return;
+                ms.position.set(getVal('ms_px_num'), getVal('ms_py_num'), getVal('ms_pz_num'));
+                ms.rotation.y = THREE.MathUtils.degToRad(getVal('ms_ry_num'));
+                const sc = getVal('ms_sc_num');
+                if (ms.children[0]) ms.children[0].scale.set(sc, sc, sc);
+            };
+            bindPair('ms_px_num', 'ms_px_rng', updateMouse);
+            bindPair('ms_py_num', 'ms_py_rng', updateMouse);
+            bindPair('ms_pz_num', 'ms_pz_rng', updateMouse);
+            bindPair('ms_ry_num', 'ms_ry_rng', updateMouse);
+            bindPair('ms_sc_num', 'ms_sc_rng', updateMouse);
+        }
+
+        setTimeout(setupPeripheralsTuningHUD, 300);
+
+        // Chair wiring (safe with defaults)
+        function setupChairHUD() {
+            function bindChairPair(numId, rngId, cb) {
+                const num = document.getElementById(numId);
+                const rng = document.getElementById(rngId);
+                if (!num || !rng) return;
+                num.addEventListener('input', () => { rng.value = num.value; cb(); });
+                rng.addEventListener('input', () => { num.value = rng.value; cb(); });
+            }
+            function updateChair() {
+                const cg = window._chairGroup;
+                const cp = window._chairPivot;
+                if (!cg || !cp) return;
+                const px = document.getElementById('ch_px_num');
+                const py = document.getElementById('ch_py_num');
+                const pz = document.getElementById('ch_pz_num');
+                const ry = document.getElementById('ch_ry_num');
+                const scEl = document.getElementById('ch_sc_num');
+                if (px && py && pz && ry && scEl) {
+                    cg.position.set(parseFloat(px.value), parseFloat(py.value), parseFloat(pz.value));
+                    cg.rotation.y = THREE.MathUtils.degToRad(parseFloat(ry.value));
+                    const sc = parseFloat(scEl.value);
+                    cp.scale.set(sc, sc, sc);
+                }
+            }
+            bindChairPair('ch_px_num','ch_px_rng', updateChair);
+            bindChairPair('ch_py_num','ch_py_rng', updateChair);
+            bindChairPair('ch_pz_num','ch_pz_rng', updateChair);
+            bindChairPair('ch_ry_num','ch_ry_rng', updateChair);
+            bindChairPair('ch_sc_num','ch_sc_rng', updateChair);
+        }
+        setTimeout(setupChairHUD, 500);
+
+        // Add iPhone & Stand down the left side of the table (near headphones/picture frame)
+        createIPhoneStand(-6.41, 3.01, -3.8, 54);
+
+        // Procedural Custom Canvas Artwork Generator
+        function createArtTexture(type) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 680;
+            const ctx = canvas.getContext('2d');
+            
+            if (type === 1) {
+                // Cyberpunk Neon Sunset Grid
+                const grad = ctx.createLinearGradient(0, 0, 0, 680);
+                grad.addColorStop(0, '#0a051b'); grad.addColorStop(0.5, '#4a154b'); grad.addColorStop(1, '#ff2a75');
+                ctx.fillStyle = grad; ctx.fillRect(0, 0, 512, 680);
+                // Sun
+                ctx.fillStyle = '#ffcc00'; ctx.beginPath(); ctx.arc(256, 320, 110, 0, Math.PI*2); ctx.fill();
+                // Grid
+                ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 2;
+                for(let y = 350; y < 680; y += 25) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke(); }
+                for(let x = 0; x <= 512; x += 40) { ctx.beginPath(); ctx.moveTo(256, 320); ctx.lineTo(x, 680); ctx.stroke(); }
+            } else if (type === 2) {
+                // Abstract Geometric Neon Art
+                ctx.fillStyle = '#11111e'; ctx.fillRect(0, 0, 512, 680);
+                ctx.fillStyle = '#00ffcc'; ctx.beginPath(); ctx.arc(200, 250, 120, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#ff00aa'; ctx.fillRect(220, 220, 180, 240);
+                ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 6; ctx.strokeRect(120, 150, 240, 320);
+            } else {
+                // Minimalist Mountain Landscape
+                const grad = ctx.createLinearGradient(0, 0, 0, 680);
+                grad.addColorStop(0, '#190a28'); grad.addColorStop(0.6, '#6b114d'); grad.addColorStop(1, '#f97316');
+                ctx.fillStyle = grad; ctx.fillRect(0, 0, 512, 680);
+                // Mountains
+                ctx.fillStyle = '#0f051d';
+                ctx.beginPath(); ctx.moveTo(0, 680); ctx.lineTo(160, 380); ctx.lineTo(320, 680); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(180, 680); ctx.lineTo(380, 280); ctx.lineTo(512, 680); ctx.fill();
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            return tex;
+        }
+
+        const texArt1 = createArtTexture(1);
+        const texArt2 = createArtTexture(2);
+        const texArt3 = createArtTexture(3);
+
+        // Standing Desk & Shelf 3D Picture Frame GLB Asset (picture_frame.glb)
+        function addPictureFrame(x, y, z, rotY = Math.PI * 0.7, height = 1.1, tag = '') {
+            if (typeof frameGlbBase64 !== 'undefined' && frameGlbBase64.length > 50) {
+                loadGlbFromBase64(frameGlbBase64, (gltf) => {
+                    const frameModel = gltf.scene.clone(true);
+                    frameModel.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+
+                    const frameBox = new THREE.Box3().setFromObject(frameModel);
+                    const center = new THREE.Vector3();
+                    frameBox.getCenter(center);
+
+                    const size = new THREE.Vector3();
+                    frameBox.getSize(size);
+                    const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
+                    const fitScale = height / maxDim;
+
+                    const framePivot = new THREE.Group();
+                    frameModel.position.set(-center.x, -frameBox.min.y, -center.z);
+                    framePivot.add(frameModel);
+                    framePivot.scale.set(fitScale, fitScale, fitScale);
+
+                    const fGroup = new THREE.Group();
+                    fGroup.position.set(x, y, z);
+                    fGroup.rotation.y = rotY; 
+                    if (tag === 'corner') fGroup.rotation.z = 0;
+                    fGroup.add(framePivot);
+
+                    scene.add(fGroup);
+
+                    if (tag === 'table') tableFrameGroupGlobal = fGroup;
+                    if (tag === 'corner') cornerShelfFrameGroupGlobal = fGroup;
+                });
+            } else {
+                // High-Fidelity 3D Picture Frame
+                const fGroup = new THREE.Group();
+                fGroup.position.set(x, y, z);
+                fGroup.rotation.y = rotY;
+                if (tag === 'corner') fGroup.rotation.z = 0;
+                
+                const frameMat = new THREE.MeshStandardMaterial({ color: 0x2b2520, roughness: 0.5 });
+                const mattingMat = new THREE.MeshStandardMaterial({ color: 0xf0ede6, roughness: 0.8 });
+                const artTex = tag === 'table' ? texArt1 : tag === 'corner' ? texArt3 : texArt2;
+                const artMat = new THREE.MeshBasicMaterial({ map: artTex });
+                
+                const outer = new THREE.Mesh(new THREE.BoxGeometry(height * 0.75, height, 0.05), frameMat);
+                fGroup.add(outer);
+                
+                const matting = new THREE.Mesh(new THREE.PlaneGeometry(height * 0.7, height * 0.94), mattingMat);
+                matting.position.z = 0.026;
+                fGroup.add(matting);
+                
+                const art = new THREE.Mesh(new THREE.PlaneGeometry(height * 0.55, height * 0.76), artMat);
+                art.position.z = 0.027;
+                fGroup.add(art);
+                
+                scene.add(fGroup);
+                if (tag === 'table') tableFrameGroupGlobal = fGroup;
+                if (tag === 'corner') cornerShelfFrameGroupGlobal = fGroup;
+            }
+        }
+
+        // Custom 3D Picture Frame Collection GLB Loader (picture_frame_collection.glb)
+        function addCollectionFrame(x, y, z, rotY = 0, height = 1.1, frameType = 'grey', tag = '') {
+            if (typeof frameCollectionGlbBase64 !== 'undefined' && frameCollectionGlbBase64.length > 50) {
+                loadGlbFromBase64(frameCollectionGlbBase64, (gltf) => {
+                    const model = gltf.scene.clone(true);
+                    
+                    const toRemove = [];
+                    model.traverse((child) => {
+                        if (child.isMesh) {
+                            const n = (child.name || '').toLowerCase();
+                            if (!(n.includes('large.001') || n.includes('object_20') || n.includes('object_22'))) {
+                                toRemove.push(child);
+                            } else {
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                            }
+                        }
+                    });
+                    toRemove.forEach(c => {
+                        if (c.parent) c.parent.remove(c);
+                    });
+
+                    model.updateMatrixWorld(true);
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = new THREE.Vector3();
+                    box.getCenter(center);
+
+                    const size = new THREE.Vector3();
+                    box.getSize(size);
+                    const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
+                    const fitScale = 1.0 / maxDim;
+
+                    const pivot = new THREE.Group();
+                    model.position.set(-center.x, -box.min.y, -center.z);
+                    pivot.add(model);
+                    pivot.scale.set(fitScale, fitScale, fitScale);
+
+                    const fGroup = new THREE.Group();
+                    fGroup.position.set(x, y, z);
+                    fGroup.rotation.y = rotY;
+                    fGroup.scale.set(height, height, height);
+                    fGroup.add(pivot);
+
+                    scene.add(fGroup);
+
+                    if (tag === 'back_shelf') backShelfFrameGroupGlobal = fGroup;
+                    if (tag === 'wall_next_to_pegboard') wallFrameGroupGlobal = fGroup;
+                });
+            } else {
+                // High-Fidelity 3D Wall Painting / Collection Frame
+                const fGroup = new THREE.Group();
+                fGroup.position.set(x, y, z);
+                fGroup.rotation.y = rotY;
+                
+                const frameMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.3, metalness: 0.7 });
+                const mattingMat = new THREE.MeshStandardMaterial({ color: 0xf5f3ee, roughness: 0.8 });
+                const artTex = tag === 'back_shelf' ? texArt2 : texArt1;
+                const artMat = new THREE.MeshBasicMaterial({ map: artTex });
+                
+                const outer = new THREE.Mesh(new THREE.BoxGeometry(height * 0.8, height, 0.04), frameMat);
+                fGroup.add(outer);
+                
+                const matting = new THREE.Mesh(new THREE.PlaneGeometry(height * 0.74, height * 0.94), mattingMat);
+                matting.position.z = 0.021;
+                fGroup.add(matting);
+                
+                const art = new THREE.Mesh(new THREE.PlaneGeometry(height * 0.58, height * 0.78), artMat);
+                art.position.z = 0.022;
+                fGroup.add(art);
+                
+                scene.add(fGroup);
+                if (tag === 'back_shelf') backShelfFrameGroupGlobal = fGroup;
+                if (tag === 'wall_next_to_pegboard') wallFrameGroupGlobal = fGroup;
+            }
+        }
+
+
+        // Place picture frame on left desk
+        addPictureFrame(-6.85, 3.55, -0.15, THREE.MathUtils.degToRad(129), 1.1, 'table');
+
+        // L-Shaped Wall Shelf — single connected piece
+        // Corner at (-7.65, 6.8, -5.8)
+        // Back wall side: from corner going right, stops above center monitor (~x=0)
+        // Left wall side: from corner going forward, stops before pegboard
+        const shelfMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.6 });
+
+        // Back wall section — shortened to end above monitors (x=-7.65 to x=-2.15)
+        const sBack = new THREE.Mesh(new THREE.BoxGeometry(5.5, 0.1, 0.7), shelfMat);
+        sBack.position.set(-4.9, 6.8, -5.8); scene.add(sBack);
+
+        // Left wall section — from back corner (z=-5.8) forward along left wall (z=-2.0)
+        const sLeft = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.1, 3.8), shelfMat);
+        sLeft.position.set(-7.65, 6.8, -3.9); scene.add(sLeft);
+
+        let leftWallVinesGroup = null;
+        let leftPottedPlantGroup = null;
+
+        let rightWallVinesGroup = null;
+        let rightPottedPlantGroup = null;
+
+        // Helper to extract a sub-node as a completely independent 3D Object with preserved original GLB world transform
+        function createIndependentPlantObject(gltfScene, nodeName) {
+            const rawNode = gltfScene.getObjectByName(nodeName);
+            if (!rawNode) return null;
+
+            gltfScene.updateMatrixWorld(true);
+            rawNode.updateMatrixWorld(true);
+
+            const clone = rawNode.clone(true);
+            const wrapper = new THREE.Group();
+            
+            // Decompose the exact world quaternion and scale directly from GLB model
+            const worldPos = new THREE.Vector3();
+            const worldQuat = new THREE.Quaternion();
+            const worldScale = new THREE.Vector3();
+            rawNode.matrixWorld.decompose(worldPos, worldQuat, worldScale);
+
+            wrapper.quaternion.copy(worldQuat);
+            wrapper.scale.copy(worldScale);
+
+            clone.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+
+            wrapper.add(clone);
+
+            const container = new THREE.Group();
+            container.add(wrapper);
+            return container;
+        }
+
+        // Load low_poly_wall_vines_potted_plant_and_plant_box.glb and create independent 3D objects for BOTH sides
+        function loadSeparatedVinesModel() {
+            if (typeof vinesGlbBase64 !== 'undefined' && vinesGlbBase64.length > 50) {
+                loadGlbFromBase64(vinesGlbBase64, (gltf) => {
+                    const gltfScene = gltf.scene;
+                    leftWallVinesGroup = createIndependentPlantObject(gltfScene, 'S_WallVines');
+                    if (leftWallVinesGroup) {
+                        leftWallVinesGroup.position.set(-7.40, 5.60, -2.15);
+                        leftWallVinesGroup.rotation.y = THREE.MathUtils.degToRad(40);
+                        scene.add(leftWallVinesGroup);
+                    }
+                    leftPottedPlantGroup = createIndependentPlantObject(gltfScene, 'S_Plant');
+                    if (leftPottedPlantGroup) {
+                        leftPottedPlantGroup.position.set(-8.35, 6.85, -3.05);
+                        leftPottedPlantGroup.rotation.y = THREE.MathUtils.degToRad(39);
+                        leftPottedPlantGroup.scale.set(0.60, 0.60, 0.60);
+                        scene.add(leftPottedPlantGroup);
+                    }
+                    rightWallVinesGroup = createIndependentPlantObject(gltfScene, 'S_WallVines');
+                    if (rightWallVinesGroup) {
+                        rightWallVinesGroup.position.set(-2.00, 5.45, -5.65);
+                        scene.add(rightWallVinesGroup);
+                    }
+                    rightPottedPlantGroup = createIndependentPlantObject(gltfScene, 'S_Plant');
+                    if (rightPottedPlantGroup) {
+                        rightPottedPlantGroup.position.set(-2.20, 6.85, -6.76);
+                        rightPottedPlantGroup.scale.set(0.60, 0.60, 0.60);
+                        scene.add(rightPottedPlantGroup);
+                    }
+                });
+            } else {
+                // --- Procedural Shelf Vines Fallback ---
+                const vineLeafMat = new THREE.MeshStandardMaterial({ color: 0x2d6b3f, roughness: 0.8, side: THREE.DoubleSide });
+                const vineLeafMatLight = new THREE.MeshStandardMaterial({ color: 0x4a9e5c, roughness: 0.75, side: THREE.DoubleSide });
+                const vineStemMat = new THREE.MeshStandardMaterial({ color: 0x3a5a2a, roughness: 0.9 });
+
+                function createLeaf(scale) {
+                    const shape = new THREE.Shape();
+                    shape.moveTo(0, 0);
+                    shape.bezierCurveTo(0.15 * scale, 0.3 * scale, 0.4 * scale, 0.35 * scale, 0.5 * scale, 0.15 * scale);
+                    shape.bezierCurveTo(0.45 * scale, 0.0, 0.2 * scale, -0.1 * scale, 0, 0);
+                    const geo = new THREE.ShapeGeometry(shape, 6);
+                    const mat = Math.random() > 0.5 ? vineLeafMat : vineLeafMatLight;
+                    const mesh = new THREE.Mesh(geo, mat);
+                    mesh.castShadow = true;
+                    return mesh;
+                }
+
+                function createVineStrand(points, leafCount) {
+                    const group = new THREE.Group();
+                    const curve = new THREE.CatmullRomCurve3(points);
+                    const tubeGeo = new THREE.TubeGeometry(curve, 20, 0.012, 6, false);
+                    const stem = new THREE.Mesh(tubeGeo, vineStemMat);
+                    stem.castShadow = true;
+                    group.add(stem);
+
+                    for (let i = 0; i < leafCount; i++) {
+                        const t = 0.15 + Math.random() * 0.75;
+                        const pt = curve.getPointAt(t);
+                        const leaf = createLeaf(0.06 + Math.random() * 0.06);
+                        leaf.position.copy(pt);
+                        leaf.rotation.set(
+                            Math.random() * 0.6 - 0.3,
+                            Math.random() * Math.PI * 2,
+                            Math.random() * 0.8 - 0.4
+                        );
+                        group.add(leaf);
+                    }
+                    return group;
+                }
+
+                function createShelfVines(x, y, z, rotY, strandCount) {
+                    const container = new THREE.Group();
+                    container.position.set(x, y, z);
+                    container.rotation.y = THREE.MathUtils.degToRad(rotY || 0);
+
+                    for (let s = 0; s < strandCount; s++) {
+                        const startX = (Math.random() - 0.5) * 0.8;
+                        const startZ = (Math.random() - 0.5) * 0.4;
+                        const hangLen = 0.5 + Math.random() * 1.2;
+                        const sway = (Math.random() - 0.5) * 0.5;
+
+                        const pts = [
+                            new THREE.Vector3(startX, 0, startZ),
+                            new THREE.Vector3(startX + sway * 0.3, -hangLen * 0.3, startZ + (Math.random() - 0.5) * 0.2),
+                            new THREE.Vector3(startX + sway * 0.6, -hangLen * 0.65, startZ + (Math.random() - 0.5) * 0.3),
+                            new THREE.Vector3(startX + sway, -hangLen, startZ + (Math.random() - 0.5) * 0.2)
+                        ];
+                        const strand = createVineStrand(pts, 4 + Math.floor(Math.random() * 5));
+                        container.add(strand);
+                    }
+                    return container;
+                }
+
+                function createPottedPlant(x, y, z, potScale) {
+                    const container = new THREE.Group();
+                    container.position.set(x, y, z);
+                    container.scale.set(potScale, potScale, potScale);
+
+                    // Pot
+                    const potMat = new THREE.MeshStandardMaterial({ color: 0xb5651d, roughness: 0.85 });
+                    const potGeo = new THREE.CylinderGeometry(0.12, 0.09, 0.2, 12);
+                    const pot = new THREE.Mesh(potGeo, potMat);
+                    pot.position.y = 0.1;
+                    pot.castShadow = true;
+                    container.add(pot);
+
+                    // Soil
+                    const soilMat = new THREE.MeshStandardMaterial({ color: 0x3d2b1f, roughness: 1.0 });
+                    const soil = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.04, 12), soilMat);
+                    soil.position.y = 0.2;
+                    container.add(soil);
+
+                    // Foliage cluster
+                    for (let i = 0; i < 12; i++) {
+                        const leaf = createLeaf(0.08 + Math.random() * 0.08);
+                        const angle = (i / 12) * Math.PI * 2 + Math.random() * 0.3;
+                        const rad = 0.05 + Math.random() * 0.1;
+                        leaf.position.set(
+                            Math.cos(angle) * rad,
+                            0.22 + Math.random() * 0.15,
+                            Math.sin(angle) * rad
+                        );
+                        leaf.rotation.set(
+                            -0.5 + Math.random() * 1.0,
+                            angle + Math.random() * 0.5,
+                            Math.random() * 0.6 - 0.3
+                        );
+                        container.add(leaf);
+                    }
+
+                    // A few trailing vines from the pot
+                    for (let v = 0; v < 3; v++) {
+                        const ang = (v / 3) * Math.PI * 2 + Math.random() * 0.5;
+                        const sx = Math.cos(ang) * 0.1;
+                        const sz = Math.sin(ang) * 0.1;
+                        const hang = 0.3 + Math.random() * 0.5;
+                        const pts = [
+                            new THREE.Vector3(sx, 0.18, sz),
+                            new THREE.Vector3(sx * 1.8, 0.05, sz * 1.8),
+                            new THREE.Vector3(sx * 2.2, -hang * 0.5, sz * 2.2),
+                            new THREE.Vector3(sx * 2.0, -hang, sz * 1.5)
+                        ];
+                        const strand = createVineStrand(pts, 3 + Math.floor(Math.random() * 3));
+                        container.add(strand);
+                    }
+
+                    return container;
+                }
+
+                // LEFT SIDE — shelf vines draping from left wall shelf
+                leftWallVinesGroup = createShelfVines(-7.40, 6.80, -2.15, 40, 8);
+                scene.add(leftWallVinesGroup);
+
+                // LEFT — potted plant on left shelf
+                leftPottedPlantGroup = createPottedPlant(-8.35, 6.85, -3.05, 0.60);
+                leftPottedPlantGroup.rotation.y = THREE.MathUtils.degToRad(39);
+                scene.add(leftPottedPlantGroup);
+
+                // RIGHT SIDE — shelf vines draping from back shelf
+                rightWallVinesGroup = createShelfVines(-2.00, 6.80, -5.65, 0, 8);
+                scene.add(rightWallVinesGroup);
+
+                // RIGHT — potted plant on back shelf
+                rightPottedPlantGroup = createPottedPlant(-2.20, 6.85, -6.76, 0.60);
+                scene.add(rightPottedPlantGroup);
+            }
+        }
+
+        // 3D Model: Mother Player Character (Flowing magenta cloak, gold necklace, white flowing hair)
+        function addMotherFigure(x, y, z) {
+            const mGroup = new THREE.Group();
+            mGroup.position.set(x, y, z);
+            mGroup.rotation.y = Math.PI / 3;
+
+            const matCloak = new THREE.MeshStandardMaterial({ color: 0x771144, roughness: 0.5, clearcoat: 0.3 });
+            const cloak = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.20, 0.65, 24, 8, true), matCloak);
+            cloak.position.y = 0.325; cloak.castShadow = true; mGroup.add(cloak);
+
+            const matWhiteDress = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+            const dressInner = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.12, 0.62, 16), matWhiteDress);
+            dressInner.position.set(0.02, 0.31, 0.02); mGroup.add(dressInner);
+
+            const cowlMat = new THREE.MeshStandardMaterial({ color: 0x440828, roughness: 0.6 });
+            const cowl = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.08, 0.12, 16), cowlMat);
+            cowl.position.y = 0.62; mGroup.add(cowl);
+
+            const matGold = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.2 });
+            const necklace = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.012, 8, 20), matGold);
+            necklace.rotation.x = Math.PI / 2; necklace.position.y = 0.58; mGroup.add(necklace);
+            for(let i=0; i<3; i++) {
+                const pendant = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.06, 8), matGold);
+                pendant.position.set(-0.04 + i*0.04, 0.52, 0.085); mGroup.add(pendant);
+            }
+
+            const maskMat = new THREE.MeshStandardMaterial({ color: 0x881144, roughness: 0.4 });
+            const head = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 16), maskMat);
+            head.scale.set(0.85, 1.1, 0.85); head.position.y = 0.72; mGroup.add(head);
+
+            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const eyeL = new THREE.Mesh(new THREE.CircleGeometry(0.008, 8), eyeMat);
+            eyeL.position.set(-0.022, 0.73, 0.055); mGroup.add(eyeL);
+            const eyeR = new THREE.Mesh(new THREE.CircleGeometry(0.008, 8), eyeMat);
+            eyeR.position.set(0.022, 0.73, 0.055); mGroup.add(eyeR);
+
+            // Clean, sleek normal white hairstyle
+            const hairMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.35, clearcoat: 0.4 });
+
+            // Main sleek hair cap over head
+            const hairCap = new THREE.Mesh(new THREE.SphereGeometry(0.078, 24, 24, 0, Math.PI * 2, 0, Math.PI * 0.65), hairMat);
+            hairCap.position.set(0, 0.73, -0.01);
+            hairCap.rotation.x = -0.2;
+            mGroup.add(hairCap);
+
+            // Side bangs framing face
+            const bangL = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.005, 0.22, 12), hairMat);
+            bangL.position.set(-0.055, 0.68, 0.03); bangL.rotation.z = 0.25; mGroup.add(bangL);
+
+            const bangR = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.005, 0.22, 12), hairMat);
+            bangR.position.set(0.055, 0.68, 0.03); bangR.rotation.z = -0.25; mGroup.add(bangR);
+
+            // Elegant swept-back hair volume
+            const hairBack = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 16), hairMat);
+            hairBack.scale.set(0.9, 1.3, 0.9);
+            hairBack.position.set(0, 0.77, -0.05);
+            hairBack.rotation.x = -0.4;
+            mGroup.add(hairBack);
+
+            scene.add(mGroup);
+        }
+
+        // 3D Model: Son Enemy (Spiky dark purple crown hair, beige collar, glowing yellow eyes)
+        function addSonFigure(x, y, z) {
+            const sGroup = new THREE.Group();
+            sGroup.position.set(x, y, z);
+            sGroup.rotation.y = THREE.MathUtils.degToRad(225);
+            window.sonFigureGroupGlobal = sGroup;
+
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1f0a2a, roughness: 0.7 });
+            const body = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.15, 0.48, 20), bodyMat);
+            body.position.y = 0.24; body.castShadow = true; sGroup.add(body);
+
+            const collarMat = new THREE.MeshStandardMaterial({ color: 0xf5eedd, roughness: 0.6 });
+            const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.08, 0.09, 16), collarMat);
+            collar.position.y = 0.45; sGroup.add(collar);
+
+            const beadMat = new THREE.MeshStandardMaterial({ color: 0x551144, roughness: 0.4 });
+            for(let i=0; i<6; i++) {
+                const angle = (i / 6) * Math.PI * 2;
+                const bead = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 8), beadMat);
+                bead.position.set(Math.cos(angle)*0.10, 0.44, Math.sin(angle)*0.10);
+                sGroup.add(bead);
+            }
+
+            const head = new THREE.Mesh(new THREE.SphereGeometry(0.06, 16, 16), bodyMat);
+            head.position.y = 0.54; sGroup.add(head);
+
+            const maskMat = new THREE.MeshStandardMaterial({ color: 0x661144, roughness: 0.4 });
+            const faceMask = new THREE.Mesh(new THREE.CircleGeometry(0.045, 12), maskMat);
+            faceMask.position.set(0, 0.54, 0.052); sGroup.add(faceMask);
+
+            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffea44 });
+            const eyeL = new THREE.Mesh(new THREE.CircleGeometry(0.01, 8), eyeMat);
+            eyeL.position.set(-0.018, 0.545, 0.055); sGroup.add(eyeL);
+            const eyeR = new THREE.Mesh(new THREE.CircleGeometry(0.01, 8), eyeMat);
+            eyeR.position.set(0.018, 0.545, 0.055); sGroup.add(eyeR);
+
+            for(let i=0; i<7; i++) {
+                const spike = new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.22, 8), bodyMat);
+                const angle = (i - 3) * 0.22;
+                spike.rotation.z = angle;
+                spike.rotation.x = -0.3;
+                spike.position.set(Math.sin(angle)*0.04, 0.62 + Math.abs(angle)*0.02, -0.03);
+                sGroup.add(spike);
+            }
+
+            scene.add(sGroup);
+        }
+
+        // 2. Row of side-by-side boxed Funkos along left wall leg (facing +X)
+        addFunko(-7.65, 6.85, -2.6, 0, Math.PI/2);
+        addFunko(-7.65, 6.85, -2.95, 1, Math.PI/2);
+        addFunko(-7.65, 6.85, -3.3, 2, Math.PI/2);
+        addFunko(-7.65, 6.85, -3.65, 3, Math.PI/2);
+        addFunko(-7.65, 6.85, -4.0, 4, Math.PI/2);
+        addFunko(-7.65, 6.85, -4.35, 5, Math.PI/2);
+
+        // Stacked Funkos on 2nd level in the center of the stack
+        addFunko(-7.65, 7.30, -3.3, 6, Math.PI/2);
+        addFunko(-7.65, 7.30, -3.65, 7, Math.PI/2);
+
+        // 1 Unboxed Funko figure in FRONT of the first boxed one
+        addErenFunko(-7.35, 6.85, -2.6);
+
+        // 3D Mother Character on LEFT side of center poster
+        addMotherFigure(-7.65, 6.85, -4.8);
+
+        // --- CORNER BEND OF L-SHELF ---
+        // 3. 3D GLB Picture Frame resting directly on shelf surface in corner (y=6.85)
+        addPictureFrame(-7.4, 7.5, -5.6, THREE.MathUtils.degToRad(40), 1.35, 'corner');
+
+        // 3D Son Enemy Character on RIGHT side of center poster
+        addSonFigure(-6.4, 6.85, -5.65);
+
+        // --- BACK WALL SHELF LEG (sBack) ---
+        // 4. Boxed Funkos before tall art
+        addFunko(-5.6, 6.85, -5.65, 8);
+        addFunko(-4.9, 6.85, -5.65, 0);
+
+        // Frame Collection Asset (Isolated Clean Grey Frame) resting directly on back shelf surface (y=6.85)
+        addCollectionFrame(-3.85, 7.35, -5.55, 0, 0.9 * 1.25, 'grey', 'back_shelf');
+
+        // Boxed Funkos next to / under tall art
+        addFunko(-3.0, 6.85, -5.65, 1);
+        addFunko(-2.6, 6.85, -5.65, 2);
+
+        // 5. Separated 3D Plant Models (Wall Vines, Potted Plant, Plant Box)
+        loadSeparatedVinesModel();
+
+        // Frame Collection Asset (Isolated Clean Grey Frame) mounted on left wall next to pegboard
+        addCollectionFrame(-7.95, 5.15, -3.06, Math.PI / 2, 2.20, 'grey', 'wall_next_to_pegboard');
+
+        // Floor Speaker Tower — beside the end of the desk
+        const spkGroup = new THREE.Group();
+        spkGroup.position.set(-6.5, 0, 0.7);
+        const spkMat = new THREE.MeshStandardMaterial({color: 0x111111, roughness: 0.7});
+        const spkBody = new THREE.Mesh(new THREE.BoxGeometry(0.52, 2.8, 0.45), spkMat);
+        spkBody.position.y = 1.4; spkBody.castShadow = true; spkGroup.add(spkBody);
+        // Grille facing room (+x direction)
+        const spkGrilleMat = new THREE.MeshStandardMaterial({color: 0x1f1f1f, roughness: 1.0});
+        const spkGrille = new THREE.Mesh(new THREE.PlaneGeometry(0.44, 2.7), spkGrilleMat);
+        spkGrille.position.set(0.27, 1.4, 0); spkGrille.rotation.y = Math.PI/2; spkGroup.add(spkGrille);
+        // Speaker drivers
+        const spkDrvMat = new THREE.MeshStandardMaterial({color: 0x303030, roughness: 0.4, metalness: 0.4});
+        for (const [dy, dr] of [[2.35, 0.06],[1.75, 0.13],[0.9, 0.15],[0.25, 0.07]]) {
+            const drv = new THREE.Mesh(new THREE.CircleGeometry(dr, 24), spkDrvMat);
+            drv.position.set(0.27, dy, 0); drv.rotation.y = Math.PI/2; spkGroup.add(drv);
+        }
+        // Purple RGB base glow
+        const spkBase = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.04, 0.43),
+            new THREE.MeshBasicMaterial({color: 0xaa44ff}));
+        spkBase.position.set(0, 0.02, 0); spkGroup.add(spkBase);
+        scene.add(spkGroup);
+
+        // Coffee mug on desk
+        const mugGroup = new THREE.Group();
+        mugGroup.position.set(-3.8, 3.0, -4.7);
+        const mugMat = new THREE.MeshStandardMaterial({color: 0x1a1a2e, roughness: 0.8});
+        const mugBody = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.07, 0.17, 20, 1, true), mugMat);
+        mugBody.position.y = 0.085; mugGroup.add(mugBody);
+        const mugBottom = new THREE.Mesh(new THREE.CircleGeometry(0.07, 20), mugMat);
+        mugBottom.rotation.x = -Math.PI/2; mugGroup.add(mugBottom);
+        const mugTop = new THREE.Mesh(new THREE.CircleGeometry(0.08, 20),
+            new THREE.MeshStandardMaterial({color: 0x0a0a1a, roughness: 0.9}));
+        mugTop.rotation.x = -Math.PI/2; mugTop.position.y = 0.17; mugGroup.add(mugTop);
+        const mugHandle = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.012, 8, 16, Math.PI), mugMat);
+        mugHandle.position.set(0.1, 0.085, 0); mugHandle.rotation.z = -Math.PI/2; mugGroup.add(mugHandle);
+        mugGroup.scale.set(2.5, 2.5, 2.5);
+        scene.add(mugGroup);
+
+        // High-Fidelity PC Tower (Lian-Li O11 Dynamic Style)
+        const pcGroup = new THREE.Group();
+        pcGroup.position.set(1.5, 4.4, -4.75); 
+        pcGroup.rotation.y = -Math.PI / 6; // Angled towards the right corner to show off the insides
+        
+        const caseMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.2, metalness: 0.1 }); 
+        const pTop = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.1, 2.0), caseMat); pTop.position.set(0, 1.25, 0); pTop.castShadow = true; pcGroup.add(pTop);
+        const pBot = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.1, 2.0), caseMat); pBot.position.set(0, -1.25, 0); pBot.castShadow = true; pcGroup.add(pBot);
+        const pBack = new THREE.Mesh(new THREE.BoxGeometry(0.7, 2.4, 0.1), caseMat); pBack.position.set(0, 0, 1.0); pcGroup.add(pBack);
+        const pLeft = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.4, 2.0), caseMat); pLeft.position.set(-0.3, 0, 0); pcGroup.add(pLeft);
+        
+        // Front and Right panels are GLASS
+        const pFront = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 2.4), matGlass); pFront.position.set(0, 0, -1.0); pcGroup.add(pFront);
+        const pcGlass = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 2.4), matGlass); pcGlass.rotation.y = Math.PI/2; pcGlass.position.set(0.35, 0, 0); pcGroup.add(pcGlass);
+        
+        // Internal Case Light to illuminate hardware
+        const pcLight = new THREE.PointLight(0xffffff, 0.5, 4);
+        pcLight.position.set(0, 0.5, 0); pcGroup.add(pcLight);
+        
+        // High-Fidelity Components
+        const matWhitePC = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+        const matSilverPC = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8, roughness: 0.2 });
+        const rgbMatWhite = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 2.5 });
+        const rgbMatPink = new THREE.MeshStandardMaterial({ color: 0xff55ff, emissive: 0xff55ff, emissiveIntensity: 2.0 });
+        const rgbMatCyan = new THREE.MeshStandardMaterial({ color: 0x55ffff, emissive: 0x55ffff, emissiveIntensity: 2.0 });
+
+        // Detailed RGB Fans
+        const fanRingGeo = new THREE.TorusGeometry(0.20, 0.03, 16, 32);
+        const fanBladeGeo = new THREE.CylinderGeometry(0.19, 0.19, 0.02, 16);
+        function createHFFan(x, y, z, rotX, rotY, rgbMat) {
+            const fGroup = new THREE.Group();
+            fGroup.position.set(x, y, z); fGroup.rotation.set(rotX, rotY, 0);
+            fGroup.add(new THREE.Mesh(fanRingGeo, rgbMat)); 
+            const blades = new THREE.Mesh(fanBladeGeo, matWhitePC); blades.rotation.x = Math.PI/2; fGroup.add(blades); 
+            return fGroup;
+        }
+        // Side Intake Fans (mounted on motherboard tray, facing X)
+        pcGroup.add(createHFFan(-0.15, 0.7, -0.6, 0, Math.PI/2, rgbMatWhite));
+        pcGroup.add(createHFFan(-0.15, 0.0, -0.6, 0, Math.PI/2, rgbMatWhite));
+        pcGroup.add(createHFFan(-0.15, -0.7, -0.6, 0, Math.PI/2, rgbMatWhite));
+        // Top Exhaust Fans (facing Y)
+        pcGroup.add(createHFFan(0, 1.15, 0.3, Math.PI/2, 0, rgbMatCyan));
+        pcGroup.add(createHFFan(0, 1.15, -0.4, Math.PI/2, 0, rgbMatCyan));
+        // Bottom Intake Fans (facing Y)
+        pcGroup.add(createHFFan(0, -1.15, -0.7, -Math.PI/2, 0, rgbMatPink));
+        pcGroup.add(createHFFan(0, -1.15, 0.0, -Math.PI/2, 0, rgbMatPink));
+        pcGroup.add(createHFFan(0, -1.15, 0.7, -Math.PI/2, 0, rgbMatPink));
+        // Rear Exhaust Fan (facing Z)
+        pcGroup.add(createHFFan(0, 0.7, 0.9, 0, 0, rgbMatPink));
+
+        // Motherboard
+        const mobo = new THREE.Mesh(new THREE.BoxGeometry(0.05, 1.8, 1.6), matSilverPC);
+        mobo.position.set(-0.23, 0.1, 0.1); pcGroup.add(mobo);
+
+        // CPU AIO Pump Block
+        const cpuGroup = new THREE.Group(); cpuGroup.position.set(-0.15, 0.5, 0.0);
+        const pumpBlock = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.3, 0.3), matWhitePC); cpuGroup.add(pumpBlock);
+        const pumpDisplay = new THREE.Mesh(new THREE.PlaneGeometry(0.25, 0.25), rgbMatPink);
+        pumpDisplay.rotation.y = Math.PI/2; pumpDisplay.position.set(0.06, 0, 0); cpuGroup.add(pumpDisplay);
+        pcGroup.add(cpuGroup);
+
+        // RAM Sticks
+        for(let i=0; i<4; i++) {
+            const ram = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.35, 0.03), matWhitePC);
+            ram.position.set(-0.1, 0.5, 0.3 + i*0.06); pcGroup.add(ram);
+            const ramRgb = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.02, 0.03), rgbMatWhite);
+            ramRgb.position.set(-0.1, 0.68, 0.3 + i*0.06); pcGroup.add(ramRgb);
+        }
+
+        // Horizontal GPU (White)
+        const gpuGroup = new THREE.Group(); gpuGroup.position.set(0.05, -0.4, 0.0);
+        const gpuBody = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.15, 1.4), matWhitePC); gpuGroup.add(gpuBody);
+        const gpuBackplate = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.02, 1.41), matSilverPC); gpuBackplate.position.y = 0.08; gpuGroup.add(gpuBackplate);
+        const gpuRgb = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.05, 1.3), rgbMatCyan); gpuRgb.position.set(0.23, 0, 0); gpuGroup.add(gpuRgb);
+        pcGroup.add(gpuGroup);
+
+        // Thick White AIO Tubes
+        const tubeMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3, clearcoat: 0.5 });
+        const curve1 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(-0.1, 0.6, 0.0), new THREE.Vector3(0.25, 0.8, -0.4), new THREE.Vector3(-0.05, 0.8, -0.6));
+        const curve2 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(-0.1, 0.4, 0.0), new THREE.Vector3(0.25, 0.6, -0.4), new THREE.Vector3(-0.05, 0.6, -0.6));
+        pcGroup.add(new THREE.Mesh(new THREE.TubeGeometry(curve1, 32, 0.025, 12, false), tubeMat));
+        pcGroup.add(new THREE.Mesh(new THREE.TubeGeometry(curve2, 32, 0.025, 12, false), tubeMat));
+        
+        // PC Top Figurines removed per user request
+        scene.add(pcGroup);
+
+        // Restore native scene.add
+        scene.add = origSceneAdd;
+
+        // =========================================================================
+        // ACTIVE THEORY SCENE 2: IN-BETWEEN COSMIC SPORES & ATMOSPHERE
+        // =========================================================================
+        const inBetweenGroup = new THREE.Group();
+        
+        const inBetweenAmbient = new THREE.AmbientLight(0xffffff, 0.6);
+        inBetweenGroup.add(inBetweenAmbient);
+
+        const inBetweenVioletLight = new THREE.PointLight(0x9900ff, 6.0, 1500);
+        inBetweenVioletLight.position.set(-300, 200, -200);
+        inBetweenGroup.add(inBetweenVioletLight);
+
+        const inBetweenCyanLight = new THREE.PointLight(0x00f3ff, 6.0, 1500);
+        inBetweenCyanLight.position.set(300, -200, -200);
+        inBetweenGroup.add(inBetweenCyanLight);
+
+        const sporeCount = 3000;
+        const sporeGeo = new THREE.BufferGeometry();
+        const sporePos = new Float32Array(sporeCount * 3);
+        const sporeColors = new Float32Array(sporeCount * 3);
+        const sporeColorOptions = [
+            new THREE.Color(0x9900ff),
+            new THREE.Color(0x00f3ff),
+            new THREE.Color(0xff00aa),
+            new THREE.Color(0x39ff14)
+        ];
+
+        for (let i = 0; i < sporeCount; i++) {
+            sporePos[i * 3] = (Math.random() - 0.5) * 1200;
+            sporePos[i * 3 + 1] = (Math.random() - 0.5) * 800;
+            sporePos[i * 3 + 2] = (Math.random() - 0.5) * 1000 - 300;
+
+            const col = sporeColorOptions[Math.floor(Math.random() * sporeColorOptions.length)];
+            sporeColors[i * 3] = col.r;
+            sporeColors[i * 3 + 1] = col.g;
+            sporeColors[i * 3 + 2] = col.b;
+        }
+
+        sporeGeo.setAttribute('position', new THREE.BufferAttribute(sporePos, 3));
+        sporeGeo.setAttribute('color', new THREE.BufferAttribute(sporeColors, 3));
+
+        const sporeMat = new THREE.PointsMaterial({
+            size: 4,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.85,
+            blending: THREE.AdditiveBlending
+        });
+        const sporeCloud = new THREE.Points(sporeGeo, sporeMat);
+        inBetweenGroup.add(sporeCloud);
+        scene.add(inBetweenGroup);
+
+        // =========================================================================
+        // ACTIVE THEORY SCENE 3: 3D CYBER HELIX SPINE & 15 PROJECT CARDS
+        // =========================================================================
+        const cardsGroup = new THREE.Group();
+
+        const cardsAmbient = new THREE.AmbientLight(0xffffff, 3.0);
+        cardsGroup.add(cardsAmbient);
+
+        const magentaAccent = new THREE.PointLight(0xff00cc, 8, 3500);
+        magentaAccent.position.set(-600, 400, 600);
+        cardsGroup.add(magentaAccent);
+
+        const cyanAccent = new THREE.PointLight(0x00e5ff, 8, 3500);
+        cyanAccent.position.set(600, -300, 600);
+        cardsGroup.add(cyanAccent);
+
+        const cameraKeyLight = new THREE.DirectionalLight(0xffffff, 3.5);
+        cardsGroup.add(cameraKeyLight);
+
+        // Central Spine Assembly
+        const spineGroup = new THREE.Group();
+        const spineCoreLight = new THREE.PointLight(0xffffff, 8.0, 2000);
+        spineCoreLight.position.set(0, 0, 150);
+        spineGroup.add(spineCoreLight);
+
+        const spineCyanRim = new THREE.PointLight(0x00f3ff, 10.0, 2200);
+        spineCyanRim.position.set(200, 300, 50);
+        spineGroup.add(spineCyanRim);
+
+        const spineMagentaRim = new THREE.PointLight(0xff00aa, 10.0, 2200);
+        spineMagentaRim.position.set(-200, -300, 50);
+        spineGroup.add(spineMagentaRim);
+
+        const spineMaterial = new THREE.MeshStandardMaterial({
+            color: 0xeef6ff,
+            emissive: 0x4a1875,
+            emissiveIntensity: 1.2,
+            roughness: 0.08,
+            metalness: 0.95,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.04,
+            side: THREE.DoubleSide
+        });
+
+        function createVertebraSegment() {
+            const vertGroup = new THREE.Group();
+            const bodyMesh = new THREE.Mesh(new THREE.TorusGeometry(85, 30, 24, 48), spineMaterial);
+            bodyMesh.rotation.x = Math.PI / 2;
+            vertGroup.add(bodyMesh);
+
+            const processMesh = new THREE.Mesh(new THREE.ConeGeometry(35, 140, 5), spineMaterial);
+            processMesh.position.set(0, 0, -90);
+            processMesh.rotation.x = -Math.PI / 3;
+            vertGroup.add(processMesh);
+
+            const leftWing = new THREE.Mesh(new THREE.ConeGeometry(28, 120, 5), spineMaterial);
+            leftWing.position.set(-90, 0, -20);
+            leftWing.rotation.z = Math.PI / 2.5;
+            vertGroup.add(leftWing);
+
+            const rightWing = new THREE.Mesh(new THREE.ConeGeometry(28, 120, 5), spineMaterial);
+            rightWing.position.set(90, 0, -20);
+            rightWing.rotation.z = -Math.PI / 2.5;
+            vertGroup.add(rightWing);
+
+            const archMesh = new THREE.Mesh(new THREE.TorusKnotGeometry(40, 10, 64, 16, 2, 3), spineMaterial);
+            archMesh.position.set(0, 30, 0);
+            vertGroup.add(archMesh);
+
+            return vertGroup;
+        }
+
+        for (let i = -7; i <= 7; i++) {
+            const vert = createVertebraSegment();
+            vert.position.y = i * 160;
+            vert.rotation.y = i * 0.25;
+            vert.scale.set(1.2, 1.2, 1.2);
+            spineGroup.add(vert);
+        }
+        cardsGroup.add(spineGroup);
+
+        // Project Cards
+        const projectData = [
+            { title: "20 YEARS OF XBOX", category: "WEBGL / INTERACTIVE", tag: "XBOX 20TH", color: "#00f3ff", accent: "#39ff14" },
+            { title: "CYBER HELIX 3D", category: "IMMERSIVE EXPERIENCE", tag: "ACTIVE THEORY", color: "#ff00aa", accent: "#00f3ff" },
+            { title: "SYNTHWAVE MATRIX", category: "AUDIO VISUALIZER", tag: "WEBGL SOUND", color: "#9000ff", accent: "#ff00aa" },
+            { title: "NEON DRIFT 2077", category: "REALTIME 3D CANVAS", tag: "THREE.JS ENGINE", color: "#39ff14", accent: "#00f3ff" },
+            { title: "AETHEL RUNNER", category: "HYBRID XR / MULTIPLAYER", tag: "METAVERSE", color: "#ff9900", accent: "#ff00aa" },
+            { title: "CHROMA REALM", category: "SHADERS & POST-FX", tag: "GPU COMPUTE", color: "#00f3ff", accent: "#9000ff" },
+            { title: "VALKYRIE GAMES", category: "INTERACTIVE GAMING", tag: "WEBGL 2.0", color: "#ff00aa", accent: "#39ff14" },
+            { title: "QUANTUM NEXUS", category: "DATA VISUALIZATION", tag: "AI SYSTEM", color: "#9000ff", accent: "#00f3ff" },
+            { title: "SOLARIS PORTFOLIO", category: "EDITORIAL DESIGN", tag: "CREATIVE DIRECTION", color: "#39ff14", accent: "#ff9900" },
+            { title: "PULSE SOUNDSCAPE", category: "EXPERIMENTAL SOUND", tag: "WEB AUDIO API", color: "#ff00aa", accent: "#00f3ff" },
+            { title: "OCTANE ARCHITECTURE", category: "SPATIAL COMPUTING", tag: "RAYTRACING", color: "#00f3ff", accent: "#ff00aa" },
+            { title: "KINETIC ENGINE", category: "PHYSICS SIMULATION", tag: "CANVAS 2D/3D", color: "#ff9900", accent: "#39ff14" },
+            { title: "NEXUS MULTIPLAYER", category: "WEBSOCKETS VR", tag: "REALTIME SYNC", color: "#9000ff", accent: "#ff00aa" },
+            { title: "SHADOW RUNNER", category: "ACTION GAMEPLAY", tag: "GLTF ENGINE", color: "#00f3ff", accent: "#39ff14" },
+            { title: "HYPERION WORLD", category: "VIRTUAL GALLERY", tag: "3D ART", color: "#ff00aa", accent: "#9000ff" }
+        ];
+
+        function createCardTexture(data, index) {
+            const cv = document.createElement('canvas');
+            cv.width = 1024; cv.height = 640;
+            const ctx = cv.getContext('2d');
+            const grad = ctx.createLinearGradient(0, 0, 1024, 640);
+            grad.addColorStop(0, '#06131c'); grad.addColorStop(0.5, '#0b202e'); grad.addColorStop(1, '#050c14');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, 1024, 640);
+
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.08)'; ctx.lineWidth = 1;
+            for (let x = 0; x < 1024; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 640); ctx.stroke(); }
+            for (let y = 0; y < 640; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1024, y); ctx.stroke(); }
+
+            ctx.strokeStyle = data.color; ctx.lineWidth = 2; ctx.globalAlpha = 0.25;
+            ctx.beginPath();
+            for (let x = 0; x < 1024; x += 10) {
+                const y = 320 + Math.sin(x * 0.015 + index) * 80 + Math.cos(x * 0.03) * 40;
+                if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke(); ctx.globalAlpha = 1.0;
+
+            ctx.fillStyle = data.accent; ctx.beginPath(); ctx.arc(70, 70, 6, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = data.color; ctx.font = 'bold 20px monospace'; ctx.fillText(data.category, 90, 76);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'; ctx.font = 'bold 24px monospace'; ctx.fillText(`[ 0${index + 1} / 15 ]`, 820, 76);
+
+            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 44px "Syne", sans-serif'; ctx.fillText(data.title, 70, 280);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.65)'; ctx.font = '22px monospace';
+            ctx.fillText('Real-time WebGL interactive world with spatial computing & GLTF.', 70, 330);
+
+            const tx = new THREE.CanvasTexture(cv);
+            tx.colorSpace = THREE.SRGBColorSpace;
+            return tx;
+        }
+
+        const CARD_WIDTH = 580; const CARD_HEIGHT = 360; const CARD_RADIUS = 28; const CARD_DEPTH = 8;
+        const cardShape = new THREE.Shape();
+        cardShape.moveTo(-CARD_WIDTH/2 + CARD_RADIUS, -CARD_HEIGHT/2);
+        cardShape.lineTo(CARD_WIDTH/2 - CARD_RADIUS, -CARD_HEIGHT/2);
+        cardShape.quadraticCurveTo(CARD_WIDTH/2, -CARD_HEIGHT/2, CARD_WIDTH/2, -CARD_HEIGHT/2 + CARD_RADIUS);
+        cardShape.lineTo(CARD_WIDTH/2, CARD_HEIGHT/2 - CARD_RADIUS);
+        cardShape.quadraticCurveTo(CARD_WIDTH/2, CARD_HEIGHT/2, CARD_WIDTH/2 - CARD_RADIUS, CARD_HEIGHT/2);
+        cardShape.lineTo(-CARD_WIDTH/2 + CARD_RADIUS, CARD_HEIGHT/2);
+        cardShape.quadraticCurveTo(-CARD_WIDTH/2, CARD_HEIGHT/2, -CARD_WIDTH/2, CARD_HEIGHT/2 - CARD_RADIUS);
+        cardShape.lineTo(-CARD_WIDTH/2, -CARD_HEIGHT/2 + CARD_RADIUS);
+        cardShape.quadraticCurveTo(-CARD_WIDTH/2, -CARD_HEIGHT/2, -CARD_WIDTH/2 + CARD_RADIUS, -CARD_HEIGHT/2);
+
+        const cardGeometry = new THREE.ExtrudeGeometry(cardShape, { depth: CARD_DEPTH, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 2, bevelThickness: 2 });
+        cardGeometry.center();
+
+        const cards = [];
+        const HELIX_RADIUS = 800; const VERTICAL_STEP = 260; const ANGLE_STEP = 0.42;
+
+        projectData.forEach((data, index) => {
+            const frontTexture = createCardTexture(data, index);
+            const frontMat = new THREE.MeshStandardMaterial({
+                map: frontTexture,
+                roughness: 0.12,
+                metalness: 0.85,
+                emissive: new THREE.Color(data.color),
+                emissiveMap: frontTexture,
+                emissiveIntensity: 0.35,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.08,
+                toneMapped: false
+            });
+
+            const bodyMat = new THREE.MeshStandardMaterial({
+                color: 0x050c14,
+                roughness: 0.3,
+                metalness: 0.9,
+                emissive: new THREE.Color(data.color),
+                emissiveIntensity: 0.15
+            });
+
+            const card = new THREE.Mesh(cardGeometry, [frontMat, bodyMat]);
+            const theta = index * ANGLE_STEP;
+            const y = -index * VERTICAL_STEP;
+            const x = Math.sin(theta) * HELIX_RADIUS;
+            const z = Math.cos(theta) * HELIX_RADIUS;
+
+            card.position.set(x, y, z);
+            card.rotation.y = theta + Math.PI;
+
+            cardsGroup.add(card);
+            cards.push(card);
+        });
+
+        const cardParticleGeo = new THREE.BufferGeometry();
+        const cardParticleCount = 1500;
+        const cardParticlePos = new Float32Array(cardParticleCount * 3);
+        const cardParticleColors = new Float32Array(cardParticleCount * 3);
+        for (let i = 0; i < cardParticleCount; i++) {
+            const r = 250 + Math.random() * 1100;
+            const theta = Math.random() * Math.PI * 2;
+            cardParticlePos[i * 3] = Math.cos(theta) * r;
+            cardParticlePos[i * 3 + 1] = (Math.random() - 0.5) * 3200;
+            cardParticlePos[i * 3 + 2] = Math.sin(theta) * r - 200;
+
+            const col = sporeColorOptions[Math.floor(Math.random() * sporeColorOptions.length)];
+            cardParticleColors[i * 3] = col.r; cardParticleColors[i * 3 + 1] = col.g; cardParticleColors[i * 3 + 2] = col.b;
+        }
+        cardParticleGeo.setAttribute('position', new THREE.BufferAttribute(cardParticlePos, 3));
+        cardParticleGeo.setAttribute('color', new THREE.BufferAttribute(cardParticleColors, 3));
+        const cardParticleMat = new THREE.PointsMaterial({ size: 6, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
+        const cardParticleCloud = new THREE.Points(cardParticleGeo, cardParticleMat);
+        cardsGroup.add(cardParticleCloud);
+
+        scene.add(cardsGroup);
+
+        // =========================================================================
+        // ACTIVE THEORY VIRTUAL SCROLL TIMELINE & INTERACTION ENGINE
+        // =========================================================================
+        let targetScrollProgress = 0;
+        let smoothScrollProgress = 0;
+        let mouseX = 0, mouseY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        gsap.registerPlugin(ScrollTrigger);
+        ScrollTrigger.create({
+            trigger: "#experience-track",
+            start: "top top",
+            end: "bottom bottom",
+            scrub: true,
+            onUpdate: (self) => {
+                targetScrollProgress = self.progress;
+            }
+        });
+
+        const inbetweenOverlay = document.getElementById('inbetween-overlay');
+        const heroInitialCamPos = new THREE.Vector3(1.09, 5.37, 2.00);
+        const heroInitialLookAt = new THREE.Vector3(-3.36, 3.80, -4.40);
+        const heroForwardDir = new THREE.Vector3().subVectors(heroInitialLookAt, heroInitialCamPos).normalize();
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+
+            smoothScrollProgress += (targetScrollProgress - smoothScrollProgress) * 0.08;
+            const p = smoothScrollProgress;
+            const time = clock.getElapsedTime();
+
+            const pingpong = (Math.sin(time * 0.35) + 1) * 0.5;
+            if (tWpLeft)  tWpLeft.offset.y  = 0.78 - pingpong * 0.78;
+            if (tWpRight) tWpRight.offset.y = 0.70 - pingpong * 0.70;
+
+            if (sporeCloud) {
+                sporeCloud.rotation.y += 0.0006;
+                sporeCloud.rotation.x += 0.0003;
+            }
+
+            if (p < 0.35) {
+                // PHASE 1: HERO ROOM STAGE
+                heroGroup.visible = true;
+                inBetweenGroup.visible = true;
+                cardsGroup.visible = false;
+                if (inbetweenOverlay) {
+                    inbetweenOverlay.style.opacity = '0';
+                    inbetweenOverlay.style.transform = 'translateY(40px)';
+                }
+
+                const phase1P = p / 0.35;
+                camera.position.copy(heroInitialCamPos).addScaledVector(heroForwardDir, phase1P * 3.5);
+                camera.lookAt(heroInitialLookAt);
+
+                heroGroup.position.copy(heroForwardDir).multiplyScalar(-phase1P * 3.0);
+                scene.fog.density = 0.02 * (1.0 - phase1P) + 0.0005 * phase1P;
+                renderer.toneMappingExposure = 1.15 * (1.0 - phase1P) + 2.0 * phase1P;
+
+            } else if (p >= 0.35 && p < 0.65) {
+                // PHASE 2: IN-BETWEEN COSMIC PASS-THROUGH
+                heroGroup.visible = false;
+                inBetweenGroup.visible = true;
+                cardsGroup.visible = false;
+
+                const phase2P = (p - 0.35) / 0.30;
+                const overlayOpacity = Math.sin(phase2P * Math.PI);
+                if (inbetweenOverlay) {
+                    inbetweenOverlay.style.opacity = overlayOpacity.toFixed(3);
+                    inbetweenOverlay.style.transform = `translateY(${(1.0 - overlayOpacity) * 20}px)`;
+                }
+
+                camera.position.set(0, 0, 500 - phase2P * 400);
+                camera.lookAt(0, 0, -1000);
+
+                scene.fog.density = 0.0004;
+                renderer.toneMappingExposure = 2.0;
+
+            } else {
+                // PHASE 3: 3D CYBER HELIX CARDS SHOWCASE (ACTIVE THEORY FOCUS & BREATHING ZOOM ENGINE)
+                heroGroup.visible = false;
+                inBetweenGroup.visible = false;
+                cardsGroup.visible = true;
+                if (inbetweenOverlay) {
+                    inbetweenOverlay.style.opacity = '0';
+                    inbetweenOverlay.style.transform = 'translateY(-30px)';
+                }
+
+                const phase3P = (p - 0.65) / 0.35;
+                const rawCardFloat = phase3P * (cards.length - 1);
+
+                // 1. Active Theory Magnetic Dwell Plateau (Slow down on cards, speed up in gaps)
+                const baseIdx = Math.floor(rawCardFloat);
+                const frac = rawCardFloat - baseIdx;
+                const easedFrac = frac < 0.5 
+                    ? 4 * frac * frac * frac 
+                    : 1 - Math.pow(-2 * frac + 2, 3) / 2;
+                const activeCardFloat = baseIdx + easedFrac;
+
+                const currentTheta = activeCardFloat * ANGLE_STEP;
+                const activeY = -activeCardFloat * VERTICAL_STEP;
+
+                const targetX = Math.sin(currentTheta) * HELIX_RADIUS;
+                const targetY = activeY;
+                const targetZ = Math.cos(currentTheta) * HELIX_RADIUS;
+
+                // 2. Active Theory Dynamic Breathing Zoom (Dolly in to 880px on cards, pull back to 1250px between cards)
+                const zoomFactor = Math.sin(frac * Math.PI); // 0 at card center, 1 in gap
+                const CAM_DIST = 880 + zoomFactor * 370;
+
+                const camX = Math.sin(currentTheta) * (HELIX_RADIUS + CAM_DIST);
+                const camY = activeY;
+                const camZ = Math.cos(currentTheta) * (HELIX_RADIUS + CAM_DIST);
+
+                camera.position.set(camX, camY, camZ);
+                camera.lookAt(targetX, targetY, targetZ);
+
+                cameraKeyLight.position.copy(camera.position);
+                cameraKeyLight.target.position.set(targetX, targetY, targetZ);
+                cameraKeyLight.target.updateMatrixWorld();
+
+                // 3. Card Focus Elevation & Sibling Depth Dynamics
+                const activeCardIdx = Math.round(activeCardFloat);
+                cards.forEach((card, idx) => {
+                    card.visible = true;
+                    const theta = idx * ANGLE_STEP;
+                    const y = -idx * VERTICAL_STEP;
+                    const baseX = Math.sin(theta) * HELIX_RADIUS;
+                    const baseZ = Math.cos(theta) * HELIX_RADIUS;
+
+                    if (idx === activeCardIdx) {
+                        // Focused Active Card: Lift forward +60px toward camera & 3D Magnetic Tilt
+                        card.rotation.x = -mouseY * 0.18;
+                        card.rotation.z = mouseX * 0.09;
+                        const normalX = Math.sin(theta);
+                        const normalZ = Math.cos(theta);
+                        card.position.set(
+                            baseX + normalX * 60,
+                            y,
+                            baseZ + normalZ * 60
+                        );
+                        card.scale.set(1.05, 1.05, 1.05);
+                    } else {
+                        card.position.set(baseX, y, baseZ);
+                        card.rotation.x = 0;
+                        card.rotation.z = 0;
+                        card.scale.set(1.0, 1.0, 1.0);
+                    }
+                });
+
+                if (spineGroup) {
+                    spineGroup.rotation.y = activeCardFloat * 0.15;
+                    spineGroup.position.set(0, activeY, 0);
+                }
+                if (cardParticleCloud) {
+                    cardParticleCloud.rotation.y += 0.0005;
+                    cardParticleCloud.position.set(0, activeY, 0);
+                }
+
+                scene.fog.density = 0.00025;
+                renderer.toneMappingExposure = 2.2;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // 8. RESIZE HANDLER
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // 9. LIVE VINES & PLANT TUNER BINDINGS
+        function bindTuner(prefix, getObj) {
+            const pxNum = document.getElementById(prefix + '_px_num');
+            const pxRng = document.getElementById(prefix + '_px_rng');
+            const pyNum = document.getElementById(prefix + '_py_num');
+            const pyRng = document.getElementById(prefix + '_py_rng');
+            const pzNum = document.getElementById(prefix + '_pz_num');
+            const pzRng = document.getElementById(prefix + '_pz_rng');
+            const rxNum = document.getElementById(prefix + '_rx_num');
+            const rxRng = document.getElementById(prefix + '_rx_rng');
+            const ryNum = document.getElementById(prefix + '_ry_num');
+            const ryRng = document.getElementById(prefix + '_ry_rng');
+            const rzNum = document.getElementById(prefix + '_rz_num');
+            const rzRng = document.getElementById(prefix + '_rz_rng');
+            const scNum = document.getElementById(prefix + '_sc_num');
+            const scRng = document.getElementById(prefix + '_sc_rng');
+
+            if (!pxNum || !pxRng) return;
+
+            function sync() {
+                const obj = getObj();
+                if (!obj) return;
+                const px = parseFloat(pxNum.value);
+                const py = parseFloat(pyNum.value);
+                const pz = parseFloat(pzNum.value);
+                const rx = THREE.MathUtils.degToRad(parseFloat(rxNum.value));
+                const ry = THREE.MathUtils.degToRad(parseFloat(ryNum.value));
+                const rz = THREE.MathUtils.degToRad(parseFloat(rzNum.value));
+                const sc = parseFloat(scNum.value);
+
+                obj.position.set(px, py, pz);
+                obj.rotation.set(rx, ry, rz);
+                obj.scale.set(sc, sc, sc);
+            }
+
+            function setupPair(numEl, rngEl) {
+                if (!numEl || !rngEl) return;
+                numEl.addEventListener('input', () => { rngEl.value = numEl.value; sync(); });
+                rngEl.addEventListener('input', () => { numEl.value = rngEl.value; sync(); });
+            }
+
+            setupPair(pxNum, pxRng);
+            setupPair(pyNum, pyRng);
+            setupPair(pzNum, pzRng);
+            setupPair(rxNum, rxRng);
+            setupPair(ryNum, ryRng);
+            setupPair(rzNum, rzRng);
+            setupPair(scNum, scRng);
+        }
+
+        bindTuner('wv1', () => leftWallVinesGroup);
+        bindTuner('pp1', () => leftPottedPlantGroup);
+        bindTuner('wv2', () => rightWallVinesGroup);
+        bindTuner('pp2', () => rightPottedPlantGroup);
+
+        animate();
+        } // end of initScene()
+
+        // 3D WebGL Cylinder Carousel
+        function init3DCarouselWebGL() {
+            const canvas = document.getElementById('webgl-carousel');
+            if (!canvas) return;
+
+            // Scene setup
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0x141515, 30, 80); // Depth falloff
+
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 45; // Depth scaling
+            camera.position.y = 0;
+
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: false, powerPreference: "high-performance", precision: "mediump" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(1.0);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(0, 10, 20);
+            scene.add(dirLight);
+
+            // Carousel Group
+            const carouselGroup = new THREE.Group();
+            scene.add(carouselGroup);
+
+            // Images and Metadata
+            const projects = [
+                { title: "Five Keys", desc: "Designed Five Keys' site appealing to all hospitality sectors.", link: "#five-keys", img: typeof pImg2 !== 'undefined' ? pImg2 : '' },
+                { title: "Lakera", desc: "Redesigned Lakera's key pages, merging AI security with sleek visuals.", link: "#lakera", img: typeof pImg5 !== 'undefined' ? pImg5 : '' },
+                { title: "Flex System", desc: "Created Flex System, a universal design toolkit for digital creators.", link: "#flex", img: typeof pImg1 !== 'undefined' ? pImg1 : '' },
+                { title: "Valurbain", desc: "Reimagined Valurbain's site: Artistic direction to Webflow development.", link: "#valurbain", img: typeof pImg4 !== 'undefined' ? pImg4 : '' },
+                { title: "Geoptis", desc: "Revitalized Geoptis’ user scenarios and UI for their geo-data journey.", link: "#geoptis", img: typeof pImg3 !== 'undefined' ? pImg3 : '' },
+                { title: "Goodjour", desc: "Built Goodjour's digital presence, crafting a unique e-store.", link: "#goodjour", img: typeof pImg6 !== 'undefined' ? pImg6 : '' }
+            ];
+
+            const totalCards = projects.length;
+            const angleStep = (Math.PI * 2) / totalCards; // 60 degrees for a tight cylinder
+            
+            const radius = 20; 
+            const cardWidth = 16; 
+            const cardHeight = 10;
+            const thetaLength = cardWidth / radius; // Curvature span
+
+            const textureLoader = new THREE.TextureLoader(window.loadingManager || loadingManager);
+            window._carouselRenderer = renderer;
+            window._carouselScene = scene;
+            window._carouselCamera = camera;
+            const meshes = [];
+
+            projects.forEach((proj, i) => {
+                // True physical cylinder segment
+                const geo = new THREE.CylinderGeometry(radius, radius, cardHeight, 64, 1, true, -thetaLength/2, thetaLength);
+                let tex = null;
+                if (proj.img) {
+                    tex = textureLoader.load(proj.img);
+                    tex.generateMipmaps = true;
+                    tex.minFilter = THREE.LinearMipmapLinearFilter;
+                }
+                const mat = new THREE.MeshStandardMaterial({
+                    map: tex,
+                    color: 0xffffff,
+                    roughness: 0.1,
+                    metalness: 0.2,
+                    side: THREE.DoubleSide,
+                    transparent: true
+                });
+                const mesh = new THREE.Mesh(geo, mat);
+                
+                // Position on the ring
+                mesh.rotation.y = i * angleStep;
+                carouselGroup.add(mesh);
+                meshes.push(mesh);
+            });
+
+            // --- Static Background 3D Text Title ---
+            const textCanvas = document.createElement('canvas');
+            textCanvas.width = 2048;
+            textCanvas.height = 512;
+            const tCtx = textCanvas.getContext('2d');
+            
+            tCtx.fillStyle = '#C5C8B8'; // Muted champagne/sage color
+            tCtx.textAlign = 'center';
+            tCtx.textBaseline = 'middle';
+            tCtx.font = '700 200px "Cormorant Garamond", "Playfair Display", serif';
+            tCtx.globalAlpha = 0.4; // Low opacity background text
+            tCtx.fillText("Selected Projects", textCanvas.width / 2, textCanvas.height / 2);
+
+            const textTexture = new THREE.CanvasTexture(textCanvas);
+            textTexture.minFilter = THREE.LinearMipmapLinearFilter;
+            
+            // Plane for the text (placed BEHIND the cards)
+            // Cards are rotated at R=20. So placing text at Z=-25 puts it behind the entire carousel?
+            // Actually, Valentin Chevalier's site has the text inside the cylinder, so the front card passes IN FRONT of it, but the back cards pass BEHIND it. 
+            // We'll place it at Z = 0, so it's perfectly in the center of the cylinder.
+            const textGeo = new THREE.PlaneGeometry(50, 12.5);
+            const textMat = new THREE.MeshBasicMaterial({ 
+                map: textTexture, 
+                transparent: true,
+                depthWrite: false
+            });
+            const textMesh = new THREE.Mesh(textGeo, textMat);
+            textMesh.position.set(0, 0, 0); 
+            scene.add(textMesh);
+
+            // State
+            let currentAngle = 0;
+            let targetAngle = 0;
+            let activeIndex = 0;
+            let isDragging = false;
+            let startX = 0;
+            let startAngle = 0;
+            let velocity = 0;
+            let lastX = 0;
+
+            // UI Elements
+            const titleEl = document.getElementById('active-project-title');
+            const descEl = document.getElementById('active-project-desc');
+            const linkEl = document.getElementById('active-project-link');
+            const prevBtn = document.getElementById('prev-project-btn');
+            const nextBtn = document.getElementById('next-project-btn');
+
+            function updateUI(index) {
+                activeIndex = index;
+                const p = projects[index];
+
+                // Update DOM elements
+                if(titleEl) titleEl.innerText = p.title;
+                if(descEl) descEl.innerText = p.desc;
+                if(linkEl) linkEl.href = p.link;
+            }
+            updateUI(0);
+
+            function rotateToIndex(index) {
+                targetAngle = -index * angleStep;
+            }
+
+            if (prevBtn) prevBtn.addEventListener('click', () => rotateToIndex((activeIndex - 1 + totalCards) % totalCards));
+            if (nextBtn) nextBtn.addEventListener('click', () => rotateToIndex((activeIndex + 1) % totalCards));
+
+            // Drag Controls
+            canvas.addEventListener('pointerdown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startAngle = targetAngle;
+                velocity = 0;
+                lastX = e.clientX;
+                canvas.style.cursor = 'grabbing';
+            });
+
+            window.addEventListener('pointermove', (e) => {
+                if (!isDragging) return;
+                const deltaX = e.clientX - startX;
+                velocity = e.clientX - lastX;
+                lastX = e.clientX;
+                targetAngle = startAngle + deltaX * 0.012; // Rotate based on drag
+            });
+
+            window.addEventListener('pointerup', () => {
+                if (!isDragging) return;
+                isDragging = false;
+                canvas.style.cursor = 'grab';
+                
+                targetAngle += velocity * 0.08; // Momentum
+                const nearestIndex = Math.round(-targetAngle / angleStep);
+                targetAngle = -nearestIndex * angleStep; // Snap
+            });
+
+            // Animation Loop (Zero-reflow numeric tracking)
+            const showcaseSection = document.getElementById('cases');
+            function animateCarousel() {
+                requestAnimationFrame(animateCarousel);
+                if (!showcaseSection) return;
+                const scrollY = window.scrollY;
+                const innerH = window.innerHeight;
+                // Pure numeric offset check — zero getBoundingClientRect calls during scroll
+                const startY = innerH * 4.5;
+                const endY = innerH * 8.5;
+                if (scrollY < startY || scrollY > endY) return;
+                const casesSection = document.getElementById('cases');
+                if (casesSection) {
+                    const rect = casesSection.getBoundingClientRect();
+                    if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+                }
+
+                currentAngle += (targetAngle - currentAngle) * 0.06;
+                carouselGroup.rotation.y = currentAngle;
+
+                const normalized = ((-currentAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+                const newActiveIndex = Math.round(normalized / angleStep) % totalCards;
+                if (newActiveIndex !== activeIndex) {
+                    updateUI(newActiveIndex);
+                }
+
+                meshes.forEach((mesh, i) => {
+                    let diff = Math.abs(i - activeIndex);
+                    if (diff > totalCards / 2) diff = totalCards - diff;
+                    mesh.material.opacity = diff === 0 ? 1.0 : diff === 1 ? 0.6 : 0.2;
+                });
+
+                renderer.render(scene, camera);
+            }
+            animateCarousel();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            window.scrollTo(0, 0);
+            initScene();
+            init3DCarouselWebGL();
+        });
+    </script>
+</body>
+</html>

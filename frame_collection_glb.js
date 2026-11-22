@@ -1,0 +1,1 @@
+const frameCollectionGlbBase64 = '';

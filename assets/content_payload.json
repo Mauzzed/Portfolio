@@ -1,0 +1,60 @@
+{
+  "brand": "ACTIVE THEORY",
+  "founded": "FOUNDED IN 2012",
+  "headline": "CREATIVE DIGITAL EXPERIENCES",
+  "heroDesc": "WE BLEND STORY, ART & TECHNOLOGY AS AN IN-HOUSE TEAM OF PASSIONATE MAKERS.",
+  "heroSub": "OUR INDUSTRY-LEADING WEB TOOLSET CONSISTENTLY DELIVERS AWARD-WINNING WORK FOR GLOBAL BRANDS.",
+  "systemStatus": "[ SYSTEM: ONLINE ] | VERSION 4.2.0",
+  "projects": [
+    {
+      "id": "01",
+      "title": "SECRET\nSKY",
+      "category": "INSTALLATIONS",
+      "year": "2021",
+      "client": "Porter Robinson",
+      "color": "#00ff88",
+      "thumbnail": "assets/secret_sky_thumb.jpg",
+      "description": "An interactive virtual festival experience built for Porter Robinson, bringing 250,000+ simultaneous global fans together in a custom WebGL dreamworld."
+    },
+    {
+      "id": "02",
+      "title": "DISCOVER\nYOUR\nPATRONUS",
+      "category": "XR / VR / AI",
+      "year": "2022",
+      "client": "Harry Potter",
+      "color": "#00f2fe",
+      "thumbnail": "assets/patronus_thumb.jpg",
+      "description": "An immersive 3D WebGL journey allowing Harry Potter fans to discover their unique Patronus through interactive gesture and sound analysis."
+    },
+    {
+      "id": "03",
+      "title": "THE\nFRONTIER\nWITHIN",
+      "category": "MULTIPLAYER",
+      "year": "2023",
+      "client": "Google Creative",
+      "color": "#a033ff",
+      "thumbnail": "assets/frontier_within_thumb.jpg",
+      "description": "A real-time biological WebGL data visualizer turning human body metrics into personalized interactive digital art sculptures."
+    },
+    {
+      "id": "04",
+      "title": "E.C.H.O.",
+      "category": "WEBSITES",
+      "year": "2023",
+      "client": "US Air Force",
+      "color": "#ff007f",
+      "thumbnail": "assets/echo_thumb.jpg",
+      "description": "An interactive cognitive skill test built with high-performance WebGL shaders measuring reaction speed, memory, and multi-tasking abilities."
+    },
+    {
+      "id": "05",
+      "title": "PAPER\nPLANES",
+      "category": "GAMES",
+      "year": "2020",
+      "client": "Google I/O",
+      "color": "#ffb700",
+      "thumbnail": "assets/paper_planes_thumb.jpg",
+      "description": "A global WebGL & mobile multiplayer experience allowing users to catch and fold virtual paper planes stamped with their location across continents."
+    }
+  ]
+}

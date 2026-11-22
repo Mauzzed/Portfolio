@@ -1,0 +1,1 @@
+const controller2GlbBase64 = '';

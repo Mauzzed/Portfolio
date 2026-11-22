@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>LunarTech Apprenticeship Case Study | Sean Forrester</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #06090f;
+            color: #e2e8f0;
+            font-family: 'Epilogue', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding: 60px 20px 100px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 243, 255, 0.4);
+            border-radius: 4px;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: #00f3ff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: #00f3ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00f3ff;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        .company-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .company-logo-img {
+            height: 28px;
+            filter: brightness(0) invert(1);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1.25;
+            color: #ffffff;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .role-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+            font-size: 12px;
+            color: #94a3b8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 18px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .meta-label {
+            color: #64748b;
+        }
+
+        .meta-val {
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+
+        .section-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #00f3ff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        p {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 14px;
+            line-height: 1.65;
+        }
+
+        .highlight-text {
+            color: #f1f5f9;
+            font-weight: 500;
+        }
+
+        /* Metric Grid */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        .metric-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            border-radius: 14px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .metric-num {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: #00f3ff;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #94a3b8;
+            line-height: 1.3;
+        }
+
+        /* App Showcase Screens */
+        .app-preview-card {
+            background: #020617;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 18px 0;
+        }
+
+        .app-preview-header {
+            padding: 12px 16px;
+            background: rgba(30, 41, 59, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 12px;
+            font-weight: 700;
+            color: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 14px 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+        }
+
+        .feature-bullet {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00f3ff;
+            margin-top: 7px;
+            flex-shrink: 0;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .tech-tag {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 40px;
+            letter-spacing: 0.5px;
+        }
+    </style>
+    <script src="lunar_logo.js"></script>
+</head>
+<body>
+
+    <div class="header-badge">
+        <div class="pulse-dot"></div>
+        UI/UX Apprenticeship
+    </div>
+
+    <div class="company-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <img class="company-logo-img" src="lunar_logo_clean.png" onerror="if (typeof texLunarLogoBase64 !== 'undefined') this.src = texLunarLogoBase64;" alt="LunarTech" style="height: 38px; width: 38px; object-fit: contain;">
+        <span style="font-size: 22px; font-weight: 800; letter-spacing: 2.5px; color: #ffffff; font-family: 'Space Grotesk', sans-serif;">LUNARTECH</span>
+    </div>
+
+    <h1>Enterprise AI & Healthcare Interaction Systems</h1>
+
+    <div class="role-meta">
+        <div class="meta-item">
+            <span class="meta-label">Role:</span>
+            <span class="meta-val">UI/UX Designer</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Period:</span>
+            <span class="meta-val">March 2026 – Present</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Domain:</span>
+            <span class="meta-val">HealthTech & Enterprise AI</span>
+        </div>
+    </div>
+
+    <!-- Section 1: Overview -->
+    <div class="section-card">
+        <div class="section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00f3ff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Apprenticeship Summary
+        </div>
+        <p>
+            During my apprenticeship at <span class="highlight-text">LunarTech</span>, I architected cross-platform design systems for proprietary enterprise solutions, focusing on scalable UI frameworks, cognitive clarity, and visual consistency across both web and native mobile interfaces.
+        </p>
+        <p>
+            I engineered high-fidelity interaction models and interactive prototypes to streamline complex user workflows—bridging raw medical data streams with empathetic, patient-first UX architectures.
+        </p>
+
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="metric-num">50+</div>
+                <div class="metric-label">Design System Components</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-num">40%</div>
+                <div class="metric-label">Reduced Intake Friction</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-num">100%</div>
+                <div class="metric-label">Mobile-First Accessibility</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-num">2</div>
+                <div class="metric-label">Core Enterprise Products</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: AstraCare Companion Project -->
+    <div class="section-card">
+        <div class="section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00f3ff" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Flagship Project: AstraCare Companion
+        </div>
+        <p>
+            A patient-facing symptom tracking and oncology care coordination mobile application engineered for oncology patients undergoing complex chemotherapy cycles.
+        </p>
+
+        <ul class="feature-list">
+            <li class="feature-item">
+                <div class="feature-bullet"></div>
+                <div><strong style="color:#fff;">Symptom Gradient Sliders:</strong> Intuitive 1–10 tactile sliders with localized severity labels (Mild, Moderate, High) designed for quick logging during peak treatment fatigue.</div>
+            </li>
+            <li class="feature-item">
+                <div class="feature-bullet"></div>
+                <div><strong style="color:#fff;">Treatment Milestone Trackers:</strong> Visual linear roadmap tracking chemotherapy cycles, pre-surgery consultations, and upcoming debulking procedures.</div>
+            </li>
+            <li class="feature-item">
+                <div class="feature-bullet"></div>
+                <div><strong style="color:#fff;">Clinical Liaison View:</strong> Dual-sided architecture allowing patients to log symptoms while oncologists receive standardized clinical reports.</div>
+            </li>
+        </ul>
+
+        <div class="tag-row">
+            <span class="tech-tag">Figma Tokens</span>
+            <span class="tech-tag">Mobile Prototyping</span>
+            <span class="tech-tag">HealthTech UX</span>
+            <span class="tech-tag">Accessibility (WCAG AAA)</span>
+        </div>
+    </div>
+
+    <!-- Section 3: Design Architecture -->
+    <div class="section-card">
+        <div class="section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00f3ff" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            Design System & Methodologies
+        </div>
+        <p>
+            By establishing shared token libraries between Figma and development staging, our team ensured consistent color grading, responsive spacing curves, and unified micro-animations across all client deliverables.
+        </p>
+        <p>
+            Every interface element underwent iterative user testing with qualitative feedback loops, validating that patients under stress could navigate their medical plan within three taps from home.
+        </p>
+    </div>
+
+    <div class="footer-note">
+        © 2026 Sean Forrester · LunarTech UI/UX Apprenticeship
+    </div>
+
+</body>
+</html>

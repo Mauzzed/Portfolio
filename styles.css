@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+    --bg-base: #050505;
+    --glass-bg: rgba(20, 20, 20, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent: #00ffcc; /* Sci-fi cyan */
+    --text-main: #f0f0f0;
+    --text-muted: #888;
+    --font-ui: 'Space Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-base);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+}
+
+/* THREE JS CANVAS */
+#webgl-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* OVERLAY UI */
+.ui-layer {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 5%;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 3rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    margin-bottom: 4rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.logo {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2.5rem;
+}
+
+.nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: var(--font-ui);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: var(--accent);
+}
+
+.btn-primary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 0.6rem 1.5rem;
+    border-radius: 4px;
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    background: var(--accent);
+    color: var(--bg-base);
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+}
+
+/* HERO */
+.hero {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.hero-content {
+    max-width: 700px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(15px);
+    padding: 4rem;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    /* Transform for 3D Tilt */
+    transform-style: preserve-3d;
+    transform: perspective(1000px);
+    transition: transform 0.1s;
+}
+
+.system-status {
+    font-family: var(--font-ui);
+    color: var(--accent);
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.system-status::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent);
+}
+
+.hero-content h1 {
+    font-size: 4rem;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+    max-width: 500px;
+}
+
+/* CASE STUDIES (Floating Grid) */
+.projects {
+    max-width: 1200px;
+    margin: 4rem auto;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.project-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    text-decoration: none;
+    color: var(--text-main);
+    transform-style: preserve-3d;
+    transform: perspective(1000px);
+    transition: border-color 0.3s;
+}
+
+.project-card:hover {
+    border-color: var(--accent);
+}
+
+.project-img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-bottom: 1px solid var(--glass-border);
+    filter: grayscale(100%) contrast(1.2);
+    transition: filter 0.3s;
+}
+
+.project-card:hover .project-img {
+    filter: grayscale(0%) contrast(1);
+}
+
+.project-info {
+    padding: 2rem;
+}
+
+.project-info h2 {
+    font-family: var(--font-ui);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.project-info p {
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   RECOVERY STYLESHEET BLOCK (ATMOSPHERIC BACKGROUND & CONTAINERS)
+   ========================================================================== */
+
+/* 1. RESTORE DARK BACKGROUND */
+body, html, #canvas-container, canvas {
+    background-color: #050508 !important;
+    color: #ffffff !important;
+}
+
+/* 2. RESTORE SECTION CONTAINERS */
+#hero-section, #inbetween-section, #cards-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#inbetween-section {
+    z-index: 1;
+    pointer-events: none;
+}
