@@ -1046,6 +1046,10 @@
     <style>
         .hud-pill-dimmed { opacity: 0.72 !important; transition: opacity 0.3s ease, all 0.3s ease !important; }
         .hud-pill-dimmed:hover { opacity: 1 !important; }
+        @keyframes deskMonitorScroll {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(0, -1400px, 0); }
+        }
     </style>
     <button id="back-to-desk-btn" onclick="if(window.resetToDesk) window.resetToDesk(event);" style="position: fixed; top: 35px; left: 35px; z-index: 2147483647; display: none; background: rgba(5, 12, 22, 0.95); border: 2px solid #00f3ff; color: #00f3ff; font-family: monospace; font-size: 14px; font-weight: 700; padding: 12px 26px; border-radius: 30px; cursor: pointer; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 0 30px rgba(0, 243, 255, 0.6); pointer-events: auto; user-select: none; transition: all 0.3s ease;">
         ← BACK TO DESK
@@ -4353,15 +4357,17 @@
         divCSSLeft.style.pointerEvents = 'none';
 
         const iframeCSSLeft = document.createElement('iframe');
-        iframeCSSLeft.src = 'https://www.bradleystudentexhibit.com';
+        iframeCSSLeft.src = '';
         iframeCSSLeft.style.width = '1440px';
-        iframeCSSLeft.style.height = '2800px';
+        iframeCSSLeft.style.height = '2200px';
         iframeCSSLeft.style.border = 'none';
         iframeCSSLeft.style.position = 'absolute';
         iframeCSSLeft.style.top = '0';
         iframeCSSLeft.style.left = '0';
         iframeCSSLeft.style.background = '#040b14';
         iframeCSSLeft.style.pointerEvents = 'none';
+        iframeCSSLeft.style.willChange = 'transform';
+        iframeCSSLeft.style.animation = 'deskMonitorScroll 18s ease-in-out infinite alternate';
         divCSSLeft.appendChild(iframeCSSLeft);
 
         const cssObjLeft = new THREE.CSS3DObject(divCSSLeft);
@@ -4435,15 +4441,17 @@
         divCSSRight.style.pointerEvents = 'none';
 
         const iframeCSSRight = document.createElement('iframe');
-        iframeCSSRight.src = 'https://bradleyinteractive.com/2025/';
+        iframeCSSRight.src = '';
         iframeCSSRight.style.width = '1440px';
-        iframeCSSRight.style.height = '2800px';
+        iframeCSSRight.style.height = '2200px';
         iframeCSSRight.style.border = 'none';
         iframeCSSRight.style.position = 'absolute';
         iframeCSSRight.style.top = '0';
         iframeCSSRight.style.left = '0';
         iframeCSSRight.style.background = '#040b14';
         iframeCSSRight.style.pointerEvents = 'none';
+        iframeCSSRight.style.willChange = 'transform';
+        iframeCSSRight.style.animation = 'deskMonitorScroll 18s ease-in-out infinite alternate';
         divCSSRight.appendChild(iframeCSSRight);
 
         const cssObjRight = new THREE.CSS3DObject(divCSSRight);
@@ -4452,6 +4460,15 @@
         cssObjRight.position.set(-0.45, 4.00, -4.33);
         cssObjRight.rotation.y = -Math.PI / 6;
         cssScene.add(cssObjRight);
+
+        window._cssNeedsRender = true;
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (!iframeCSSLeft.src) iframeCSSLeft.src = 'https://www.bradleystudentexhibit.com';
+                if (!iframeCSSRight.src) iframeCSSRight.src = 'https://bradleyinteractive.com/2025/';
+                window._cssNeedsRender = true;
+            }, 900);
+        });
 
         const backToDeskBtn = document.getElementById('back-to-desk-btn');
         let isGlitchTriggered = false;
@@ -5154,33 +5171,28 @@
                 }
             }
 
-            // Auto-scroll live CSS3D pages on desk monitors and keep them visible during zoom-in (no static screenshots!)
+            // Auto-scroll live CSS3D pages on GPU compositor and keep them visible during zoom-in
             const onHeroRoom = window.scrollY < window.innerHeight * 0.8;
             if (!onHeroRoom) {
-                divCSSLeft.style.display = 'none';
-                divCSSRight.style.display = 'none';
+                if (divCSSLeft.style.display !== 'none') divCSSLeft.style.display = 'none';
+                if (divCSSRight.style.display !== 'none') divCSSRight.style.display = 'none';
             } else if (!isZoomedIn) {
-                const pingpong = (Math.sin(time * 0.35) + 1) * 0.5;
-                divCSSLeft.style.display = 'block';
-                divCSSRight.style.display = 'block';
-                divCSSLeft.style.opacity = (introFlashPulse > 0 || isLeftHovered) ? '0.68' : '1';
-                divCSSRight.style.opacity = (introFlashPulse > 0 || isRightHovered) ? '0.68' : '1';
-
-                const maxScrollCSS = 2800 - 797;
-                if (!isLeftHovered) {
-                    iframeCSSLeft.style.transform = `translateY(-${(pingpong * maxScrollCSS).toFixed(1)}px)`;
-                }
-                if (!isRightHovered) {
-                    iframeCSSRight.style.transform = `translateY(-${(pingpong * maxScrollCSS).toFixed(1)}px)`;
-                }
+                if (divCSSLeft.style.display !== 'block') { divCSSLeft.style.display = 'block'; window._cssNeedsRender = true; }
+                if (divCSSRight.style.display !== 'block') { divCSSRight.style.display = 'block'; window._cssNeedsRender = true; }
+                const opL = (introFlashPulse > 0 || isLeftHovered) ? '0.68' : '1';
+                const opR = (introFlashPulse > 0 || isRightHovered) ? '0.68' : '1';
+                if (divCSSLeft.style.opacity !== opL) divCSSLeft.style.opacity = opL;
+                if (divCSSRight.style.opacity !== opR) divCSSRight.style.opacity = opR;
+                iframeCSSLeft.style.animationPlayState = isLeftHovered ? 'paused' : 'running';
+                iframeCSSRight.style.animationPlayState = isRightHovered ? 'paused' : 'running';
             } else if (!isGlitchTriggered) {
-                // During camera zoom-in: keep live CSS3D monitors visible and reset scroll to top smoothly
-                divCSSLeft.style.display = 'block';
-                divCSSRight.style.display = 'block';
+                // During camera zoom-in: keep live CSS3D monitors visible
+                if (divCSSLeft.style.display !== 'block') divCSSLeft.style.display = 'block';
+                if (divCSSRight.style.display !== 'block') divCSSRight.style.display = 'block';
                 divCSSLeft.style.opacity = '1';
                 divCSSRight.style.opacity = '1';
-                iframeCSSLeft.style.transform = 'translateY(0px)';
-                iframeCSSRight.style.transform = 'translateY(0px)';
+                iframeCSSLeft.style.animationPlayState = 'paused';
+                iframeCSSRight.style.animationPlayState = 'paused';
             } else {
                 // Once unscaled interactive stage is active on top, hide only the zoomed CSS3D plane
                 if (activeCaseStudyId === 'art-exhibition') divCSSLeft.style.display = 'none';
@@ -5250,7 +5262,10 @@
             }
 
             renderer.render(scene, camera);
-            if (cssRenderer) cssRenderer.render(cssScene, camera);
+            if (cssRenderer && (camTweenActive || window._cssNeedsRender)) {
+                cssRenderer.render(cssScene, camera);
+                if (!camTweenActive) window._cssNeedsRender = false;
+            }
         }
 
         // 8. RESIZE HANDLER
@@ -5258,7 +5273,10 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            if (cssRenderer) cssRenderer.setSize(window.innerWidth, window.innerHeight);
+            if (cssRenderer) {
+                cssRenderer.setSize(window.innerWidth, window.innerHeight);
+                window._cssNeedsRender = true;
+            }
             if (isZoomedIn && activeMonitorName) {
                 fitStageToMonitor(activeMonitorName);
             }
