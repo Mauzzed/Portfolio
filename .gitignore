@@ -1,0 +1,16 @@
+# Ignore local scratch, backups, automation scripts, and oversized raw media
+*.ps1
+*.bat
+*.zip
+*.gif
+*.tmp
+*.log
+Transition.mp4
+*BACKUP*
+index.backup*
+index_CHECKPOINT*
+index_failsafe*
+index_canvas*
+.agents/
+AGENTS.md
+GEMINI.md

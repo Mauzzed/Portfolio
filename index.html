@@ -449,8 +449,8 @@
         /* 45-degree Chamfered Octagonal Media Frame (Active Theory Patronus signature) */
         .at-cs-frame-wrap {
             position: relative;
-            width: 78%;
-            max-width: 980px;
+            width: 86%;
+            max-width: 1120px;
             aspect-ratio: 16 / 10;
             opacity: 0;
             transform: perspective(1200px) scale(0.76);
@@ -1016,7 +1016,7 @@
                 <span>CLOSE</span>
             </button>
         </div>
-        <div id="at-cs-framer-embed" style="display:none;position:fixed;inset:0;z-index:5;overflow:hidden;background:#0c0e14;">
+        <div id="at-cs-framer-embed" style="display:none;position:fixed;top:74px;left:0;right:0;bottom:0;z-index:5;overflow:hidden;background:#0c0e14;border-top:1px solid rgba(255,255,255,0.08);">
             <iframe id="at-cs-framer-iframe" src="about:blank" style="width:100%;height:100%;border:none;position:absolute;top:0;left:0;background:#0c0e14;"></iframe>
         </div>
         <section class="at-cs-hero">
@@ -1046,10 +1046,6 @@
     <style>
         .hud-pill-dimmed { opacity: 0.72 !important; transition: opacity 0.3s ease, all 0.3s ease !important; }
         .hud-pill-dimmed:hover { opacity: 1 !important; }
-        @keyframes deskMonitorScroll {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(0, -1400px, 0); }
-        }
     </style>
     <button id="back-to-desk-btn" onclick="if(window.resetToDesk) window.resetToDesk(event);" style="position: fixed; top: 35px; left: 35px; z-index: 2147483647; display: none; background: rgba(5, 12, 22, 0.95); border: 2px solid #00f3ff; color: #00f3ff; font-family: monospace; font-size: 14px; font-weight: 700; padding: 12px 26px; border-radius: 30px; cursor: pointer; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 0 30px rgba(0, 243, 255, 0.6); pointer-events: auto; user-select: none; transition: all 0.3s ease;">
         ← BACK TO DESK
@@ -1547,14 +1543,14 @@
         const tCarpet = typeof texCarpetBase64 !== 'undefined' ? textureLoader.load(texCarpetBase64) : null;
         if (tCarpet) { tCarpet.wrapS = THREE.RepeatWrapping; tCarpet.wrapT = THREE.RepeatWrapping; tCarpet.repeat.set(8, 8); }
         
-        const tWpLeft = typeof texLeftWpBase64 !== 'undefined' ? textureLoader.load(texLeftWpBase64) : null; 
-        if (tWpLeft) { tWpLeft.wrapT = THREE.RepeatWrapping; tWpLeft.repeat.set(1, 0.30); tWpLeft.offset.set(0, 0); }
+        const tWpLeft = textureLoader.load('assets/live_exhibit_scroll.png');
+        if (tWpLeft) { tWpLeft.wrapT = THREE.ClampToEdgeWrapping; tWpLeft.repeat.set(1, 0.25); tWpLeft.offset.set(0, 0.75); }
 
         const tWpMid = typeof texMidWpBase64 !== 'undefined' ? textureLoader.load(texMidWpBase64) : null;
         if (tWpMid) { tWpMid.repeat.set(1, 1); tWpMid.offset.set(0, 0); }
 
-        const tWpRight = typeof texRightWpBase64 !== 'undefined' ? textureLoader.load(texRightWpBase64) : null; 
-        if (tWpRight) { tWpRight.wrapT = THREE.RepeatWrapping; tWpRight.repeat.set(1, 0.22); tWpRight.offset.set(0, 0); }
+        const tWpRight = textureLoader.load('assets/live_fuse_scroll.png');
+        if (tWpRight) { tWpRight.wrapT = THREE.ClampToEdgeWrapping; tWpRight.repeat.set(1, 0.25); tWpRight.offset.set(0, 0.75); }
         
         const tPoster = typeof texPosterBase64 !== 'undefined' ? textureLoader.load(texPosterBase64) : null;
 
@@ -1589,9 +1585,9 @@
         const matMat = new THREE.MeshStandardMaterial({ color: 0x020202, roughness: 0.9 });
         
         // Emissive materials
-        const matScrnLeft = new THREE.MeshStandardMaterial({ emissive: 0x040b14, emissiveIntensity: 1.0, color: 0x040b14, roughness: 0.1 });
+        const matScrnLeft = new THREE.MeshStandardMaterial({ map: tWpLeft, emissiveMap: tWpLeft, emissive: 0xffffff, emissiveIntensity: 1.5, color: 0x000000, roughness: 0.1 });
         const matScrnMid = new THREE.MeshStandardMaterial({ map: tWpMid, emissiveMap: tWpMid, emissive: 0xffffff, emissiveIntensity: 1.5, color: 0x000000, roughness: 0.1 });
-        const matScrnRight = new THREE.MeshStandardMaterial({ emissive: 0x040b14, emissiveIntensity: 1.0, color: 0x040b14, roughness: 0.1 });
+        const matScrnRight = new THREE.MeshStandardMaterial({ map: tWpRight, emissiveMap: tWpRight, emissive: 0xffffff, emissiveIntensity: 1.5, color: 0x000000, roughness: 0.1 });
         const matPoster = new THREE.MeshBasicMaterial({ map: tPoster });
 
         // --- 3D IPHONE BOOT & CASE STUDY SCREEN GENERATOR (Native 1024x2176 on 3D Screen) ---
@@ -4359,18 +4355,18 @@
         const iframeCSSLeft = document.createElement('iframe');
         iframeCSSLeft.src = '';
         iframeCSSLeft.style.width = '1440px';
-        iframeCSSLeft.style.height = '2200px';
+        iframeCSSLeft.style.height = '797px';
         iframeCSSLeft.style.border = 'none';
         iframeCSSLeft.style.position = 'absolute';
         iframeCSSLeft.style.top = '0';
         iframeCSSLeft.style.left = '0';
         iframeCSSLeft.style.background = '#040b14';
         iframeCSSLeft.style.pointerEvents = 'none';
-        iframeCSSLeft.style.willChange = 'transform';
-        iframeCSSLeft.style.animation = 'deskMonitorScroll 18s ease-in-out infinite alternate';
+        divCSSLeft.style.clipPath = 'inset(0)';
         divCSSLeft.appendChild(iframeCSSLeft);
 
         const cssObjLeft = new THREE.CSS3DObject(divCSSLeft);
+        cssObjLeft.visible = false;
         const sL = 2.15 / 1440;
         cssObjLeft.scale.set(sL, sL, sL);
         cssObjLeft.position.set(-4.55, 4.00, -4.33);
@@ -4422,6 +4418,7 @@
         divCSSMid.appendChild(trailerOverlayMid);
 
         const cssObjMid = new THREE.CSS3DObject(divCSSMid);
+        cssObjMid.visible = false;
         const sM = 2.15 / 1024;
         cssObjMid.scale.set(sM, sM, sM);
         cssObjMid.position.set(-2.50, 4.00, -4.885);
@@ -4443,35 +4440,27 @@
         const iframeCSSRight = document.createElement('iframe');
         iframeCSSRight.src = '';
         iframeCSSRight.style.width = '1440px';
-        iframeCSSRight.style.height = '2200px';
+        iframeCSSRight.style.height = '797px';
         iframeCSSRight.style.border = 'none';
         iframeCSSRight.style.position = 'absolute';
         iframeCSSRight.style.top = '0';
         iframeCSSRight.style.left = '0';
         iframeCSSRight.style.background = '#040b14';
         iframeCSSRight.style.pointerEvents = 'none';
-        iframeCSSRight.style.willChange = 'transform';
-        iframeCSSRight.style.animation = 'deskMonitorScroll 18s ease-in-out infinite alternate';
+        divCSSRight.style.clipPath = 'inset(0)';
         divCSSRight.appendChild(iframeCSSRight);
 
         const cssObjRight = new THREE.CSS3DObject(divCSSRight);
+        cssObjRight.visible = false;
         const sR = 2.15 / 1440;
         cssObjRight.scale.set(sR, sR, sR);
         cssObjRight.position.set(-0.45, 4.00, -4.33);
         cssObjRight.rotation.y = -Math.PI / 6;
         cssScene.add(cssObjRight);
 
-        window._cssNeedsRender = true;
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                if (!iframeCSSLeft.src) iframeCSSLeft.src = 'https://www.bradleystudentexhibit.com';
-                if (!iframeCSSRight.src) iframeCSSRight.src = 'https://bradleyinteractive.com/2025/';
-                window._cssNeedsRender = true;
-            }, 900);
-        });
-
         const backToDeskBtn = document.getElementById('back-to-desk-btn');
         let isGlitchTriggered = false;
+        let phoneIframeLoaded = false;
 
         const startCamPos = DESK_HOME_POS.clone();
         const startCamLook = DESK_HOME_LOOK.clone();
@@ -4528,8 +4517,9 @@
             wrapper.style.top = Math.round(minY) + 'px';
             wrapper.style.width = stageW + 'px';
             wrapper.style.height = stageH + 'px';
-            wrapper.style.borderRadius = '0px';
-            wrapper.style.clipPath = 'none';
+            wrapper.style.borderRadius = monName === 'phone' ? '18px' : '0px';
+            wrapper.style.clipPath = monName === 'phone' ? 'inset(0 round 18px)' : 'inset(0)';
+            wrapper.style.contain = 'paint';
 
             if (iframe) {
                 iframe.style.top = '0px';
@@ -4580,12 +4570,41 @@
             if (tWpLeft)  tWpLeft.offset.y  = 0.78;
             if (tWpRight) tWpRight.offset.y = 0.70;
 
-            startCamTween(view.pos, view.look, 1.1);
+            startCamTween(view.pos, view.look, monName === 'phone' ? 0.85 : 1.1);
             if (monName === 'phone') {
                 matPhoneScreen.emissiveIntensity = 1.8;
                 if (phoneScreenMode === 'off') {
                     phoneScreenMode = 'booting';
-                    renderPhoneBootScreen(phoneBootProgress, 'booting', 0);
+                    renderPhoneBootScreen(0, 'booting', 0);
+                }
+                // Preload LunarTech Academy immediately on click so it's ready the instant the zoom finishes
+                const phoneIframe = document.getElementById('monitor-live-iframe');
+                const phoneWrapper = document.getElementById('monitor-iframe-wrapper');
+                const phoneVideo = document.getElementById('monitor-live-video');
+                phoneIframeLoaded = false;
+                if (phoneVideo) phoneVideo.style.display = 'none';
+                if (phoneWrapper && phoneIframe) {
+                    // Pre-size wrapper & iframe BEFORE setting src so first-time cold load never boots at 0x0 viewport
+                    const initH = Math.round(window.innerHeight * 0.72);
+                    const initW = Math.round(initH * (242 / 502));
+                    const initScale = initW / 390;
+                    phoneWrapper.style.left = Math.round((window.innerWidth - initW) * 0.5) + 'px';
+                    phoneWrapper.style.top = Math.round((window.innerHeight - initH) * 0.5) + 'px';
+                    phoneWrapper.style.width = initW + 'px';
+                    phoneWrapper.style.height = initH + 'px';
+                    phoneWrapper.style.borderRadius = '18px';
+                    phoneWrapper.style.clipPath = 'inset(0 round 18px)';
+                    phoneWrapper.style.contain = 'paint';
+                    phoneWrapper.style.opacity = '0';
+                    phoneWrapper.style.display = 'block';
+                    phoneWrapper.style.pointerEvents = 'none';
+                    phoneIframe.style.width = (390 + 17) + 'px';
+                    phoneIframe.style.height = Math.round(initH / initScale) + 'px';
+                    phoneIframe.style.transformOrigin = 'top left';
+                    phoneIframe.style.transform = `scale(${initScale})`;
+                    phoneIframe.style.display = 'block';
+                    phoneIframe.onload = () => { phoneIframeLoaded = true; };
+                    phoneIframe.src = 'https://academy.lunartech.ai';
                 }
             }
             if (backToDeskBtn) {
@@ -4862,14 +4881,15 @@
             cssRenderer.domElement.style.zIndex = '0';
             if (window._heroRenderer) window._heroRenderer.domElement.style.pointerEvents = 'auto';
 
-            // Keep live sites visible on left/right monitors immediately when zooming back out
-            divCSSLeft.style.display = 'block';
-            divCSSLeft.style.opacity = '1';
-            divCSSRight.style.display = 'block';
-            divCSSRight.style.opacity = '1';
+            divCSSLeft.style.display = 'none';
+            divCSSRight.style.display = 'none';
 
-            // Glitch flicker & restore middle monitor wallpaper on zoom out (left/right stay live)
-            if (activeCaseStudyId === 'game-trailer' && matScrnMid && tWpMid) {
+            // Glitch flicker & restore website wallpaper textures on zoom out
+            if (activeCaseStudyId === 'art-exhibition' && matScrnLeft && tWpLeft) {
+                runGlitchSwap(matScrnLeft, tWpLeft);
+            } else if (activeCaseStudyId === 'fuse' && matScrnRight && tWpRight) {
+                runGlitchSwap(matScrnRight, tWpRight);
+            } else if (activeCaseStudyId === 'game-trailer' && matScrnMid && tWpMid) {
                 runGlitchSwap(matScrnMid, tWpMid);
             }
 
@@ -5100,8 +5120,7 @@
                 const flashBoost = introFlashPulse * 2.6;
                 const flashTint = introFlashPulse * 0.85;
                 if (matScrnLeft) {
-                    matScrnLeft.emissive.setHex((isLeftHovered || introFlashPulse > 0) ? 0xffffff : 0x040b14);
-                    matScrnLeft.emissiveIntensity = (isLeftHovered ? 2.0 : 1.0) + flashBoost;
+                    matScrnLeft.emissiveIntensity = (isLeftHovered ? 2.0 : 1.5) + flashBoost;
                     if (introFlashPulse > 0) matScrnLeft.color.setRGB(flashTint, flashTint, flashTint);
                 }
                 if (matScrnMid) {
@@ -5109,8 +5128,7 @@
                     if (introFlashPulse > 0) matScrnMid.color.setRGB(flashTint, flashTint, flashTint);
                 }
                 if (matScrnRight) {
-                    matScrnRight.emissive.setHex((isRightHovered || introFlashPulse > 0) ? 0xffffff : 0x040b14);
-                    matScrnRight.emissiveIntensity = (isRightHovered ? 2.0 : 1.0) + flashBoost;
+                    matScrnRight.emissiveIntensity = (isRightHovered ? 2.0 : 1.5) + flashBoost;
                     if (introFlashPulse > 0) matScrnRight.color.setRGB(flashTint, flashTint, flashTint);
                 }
             }
@@ -5142,63 +5160,28 @@
                         renderPhoneBootScreen(0, 'off', 0);
                     }
                 }
-            } else if (isZoomedIn && activeCaseStudyId === 'lunartech') {
+            } else if (isZoomedIn && activeCaseStudyId === 'lunartech' && !isGlitchTriggered) {
+                // Keep clean LunarTech OLED mark on the 3D phone while zooming in (no disappearing loading bar)
                 matPhoneScreen.emissiveIntensity = 1.8;
-                const distToPhone = camera.position.distanceTo(targetCamPos);
-
-                // WHILE CAMERA IS STILL ZOOMING IN: Only show glowing LunarTech logo mark, NO progress bar!
-                if (distToPhone > 0.08 && phoneScreenMode !== 'active') {
-                    phoneBootProgress = 0;
-                    phoneBootStartTime = 0;
-                    renderPhoneBootScreen(0, 'booting', 0);
-                } else if (phoneScreenMode === 'booting') {
-                    // ZOOM IN IS NOW COMPLETE: Start loading the progress bar at a smooth authentic pace!
-                    if (phoneBootStartTime === 0) {
-                        phoneBootStartTime = Date.now();
-                    }
-                    const elapsed = Date.now() - phoneBootStartTime;
-                    phoneBootProgress = Math.min(1.0, elapsed / 2200); // 2.2s deliberate, smooth fill
-                    renderPhoneBootScreen(phoneBootProgress, 'booting', 0);
-
-                    if (phoneBootProgress >= 1.0) {
-                        phoneScreenMode = 'active';
-                        renderPhoneBootScreen(1.0, 'active', phoneScrollY);
-                    }
-                } else if (phoneScreenMode === 'active') {
-                    // Smooth momentum scrolling directly on 3D phone screen
-                    if (Math.abs(phoneScrollTargetY - phoneScrollY) > 0.2) {
-                        phoneScrollY = THREE.MathUtils.lerp(phoneScrollY, phoneScrollTargetY, 0.12);
-                        renderPhoneBootScreen(1.0, 'active', phoneScrollY);
-                    }
-                }
+                phoneBootProgress = 0;
+                phoneBootStartTime = 0;
+                phoneScreenMode = 'booting';
+                renderPhoneBootScreen(0, 'booting', 0);
             }
 
-            // Auto-scroll live CSS3D pages on GPU compositor and keep them visible during zoom-in
-            const onHeroRoom = window.scrollY < window.innerHeight * 0.8;
-            if (!onHeroRoom) {
-                if (divCSSLeft.style.display !== 'none') divCSSLeft.style.display = 'none';
-                if (divCSSRight.style.display !== 'none') divCSSRight.style.display = 'none';
-            } else if (!isZoomedIn) {
-                if (divCSSLeft.style.display !== 'block') { divCSSLeft.style.display = 'block'; window._cssNeedsRender = true; }
-                if (divCSSRight.style.display !== 'block') { divCSSRight.style.display = 'block'; window._cssNeedsRender = true; }
-                const opL = (introFlashPulse > 0 || isLeftHovered) ? '0.68' : '1';
-                const opR = (introFlashPulse > 0 || isRightHovered) ? '0.68' : '1';
-                if (divCSSLeft.style.opacity !== opL) divCSSLeft.style.opacity = opL;
-                if (divCSSRight.style.opacity !== opR) divCSSRight.style.opacity = opR;
-                iframeCSSLeft.style.animationPlayState = isLeftHovered ? 'paused' : 'running';
-                iframeCSSRight.style.animationPlayState = isRightHovered ? 'paused' : 'running';
+            // Smooth 60fps passive-scrolling textures on left/right desk monitors (CSS3D planes kept hidden)
+            cssObjLeft.visible = false;
+            cssObjMid.visible = false;
+            cssObjRight.visible = false;
+            divCSSLeft.style.display = 'none';
+            divCSSRight.style.display = 'none';
+            if (!isZoomedIn) {
+                const pingpong = (Math.sin(time * 0.35) + 1) * 0.5;
+                if (tWpLeft && !isLeftHovered)  tWpLeft.offset.y  = 0.75 - pingpong * 0.75;
+                if (tWpRight && !isRightHovered) tWpRight.offset.y = 0.75 - pingpong * 0.75;
             } else if (!isGlitchTriggered) {
-                // During camera zoom-in: keep live CSS3D monitors visible
-                if (divCSSLeft.style.display !== 'block') divCSSLeft.style.display = 'block';
-                if (divCSSRight.style.display !== 'block') divCSSRight.style.display = 'block';
-                divCSSLeft.style.opacity = '1';
-                divCSSRight.style.opacity = '1';
-                iframeCSSLeft.style.animationPlayState = 'paused';
-                iframeCSSRight.style.animationPlayState = 'paused';
-            } else {
-                // Once unscaled interactive stage is active on top, hide only the zoomed CSS3D plane
-                if (activeCaseStudyId === 'art-exhibition') divCSSLeft.style.display = 'none';
-                if (activeCaseStudyId === 'fuse') divCSSRight.style.display = 'none';
+                if (tWpLeft)  tWpLeft.offset.y  = 0.75;
+                if (tWpRight) tWpRight.offset.y = 0.75;
             }
 
             // Camera smooth cubic ease-in-out tween directly in front of 3D monitor or phone screen
@@ -5250,15 +5233,29 @@
                     startGameTrailerSequence();
                 } else if (activeCaseStudyId === 'lunartech' && wrapper && iframe) {
                     if (video) video.style.display = 'none';
-                    phoneScreenMode = 'off';
-                    renderPhoneBootScreen(0, 'off', 0);
-                    if (typeof matPhoneScreen !== 'undefined' && matPhoneScreen) matPhoneScreen.emissiveIntensity = 0.0;
                     fitStageToMonitor('phone');
-                    iframe.style.display = 'block';
-                    iframe.src = 'https://academy.lunartech.ai';
                     wrapper.style.display = 'block';
                     wrapper.style.pointerEvents = 'auto';
-                    requestAnimationFrame(() => { wrapper.style.opacity = '1'; });
+                    iframe.style.display = 'block';
+                    let revealed = false;
+                    const revealPhoneSite = () => {
+                        if (revealed || !isZoomedIn || activeCaseStudyId !== 'lunartech') return;
+                        revealed = true;
+                        wrapper.style.opacity = '1';
+                        setTimeout(() => {
+                            if (isZoomedIn && activeCaseStudyId === 'lunartech') {
+                                phoneScreenMode = 'off';
+                                renderPhoneBootScreen(0, 'off', 0);
+                                if (typeof matPhoneScreen !== 'undefined' && matPhoneScreen) matPhoneScreen.emissiveIntensity = 0.0;
+                            }
+                        }, 280);
+                    };
+                    if (phoneIframeLoaded) {
+                        revealPhoneSite();
+                    } else {
+                        iframe.onload = () => { phoneIframeLoaded = true; revealPhoneSite(); };
+                        setTimeout(revealPhoneSite, 1800);
+                    }
                     showMonitorCasePill('lunartech');
                 }
             }
@@ -5272,10 +5269,7 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            if (cssRenderer) {
-                cssRenderer.setSize(window.innerWidth, window.innerHeight);
-                window._cssNeedsRender = true;
-            }
+            if (cssRenderer) cssRenderer.setSize(window.innerWidth, window.innerHeight);
             if (isZoomedIn && activeMonitorName) {
                 fitStageToMonitor(activeMonitorName);
             }
