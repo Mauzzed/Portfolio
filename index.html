@@ -5100,7 +5100,8 @@
                 const flashBoost = introFlashPulse * 2.6;
                 const flashTint = introFlashPulse * 0.85;
                 if (matScrnLeft) {
-                    matScrnLeft.emissiveIntensity = (isLeftHovered ? 2.0 : 1.5) + flashBoost;
+                    matScrnLeft.emissive.setHex((isLeftHovered || introFlashPulse > 0) ? 0xffffff : 0x040b14);
+                    matScrnLeft.emissiveIntensity = (isLeftHovered ? 2.0 : 1.0) + flashBoost;
                     if (introFlashPulse > 0) matScrnLeft.color.setRGB(flashTint, flashTint, flashTint);
                 }
                 if (matScrnMid) {
@@ -5108,7 +5109,8 @@
                     if (introFlashPulse > 0) matScrnMid.color.setRGB(flashTint, flashTint, flashTint);
                 }
                 if (matScrnRight) {
-                    matScrnRight.emissiveIntensity = (isRightHovered ? 2.0 : 1.5) + flashBoost;
+                    matScrnRight.emissive.setHex((isRightHovered || introFlashPulse > 0) ? 0xffffff : 0x040b14);
+                    matScrnRight.emissiveIntensity = (isRightHovered ? 2.0 : 1.0) + flashBoost;
                     if (introFlashPulse > 0) matScrnRight.color.setRGB(flashTint, flashTint, flashTint);
                 }
             }
@@ -5262,10 +5264,7 @@
             }
 
             renderer.render(scene, camera);
-            if (cssRenderer && (camTweenActive || window._cssNeedsRender)) {
-                cssRenderer.render(cssScene, camera);
-                if (!camTweenActive) window._cssNeedsRender = false;
-            }
+            if (cssRenderer) cssRenderer.render(cssScene, camera);
         }
 
         // 8. RESIZE HANDLER
