@@ -1267,7 +1267,7 @@
             }
         </style>
 
-        <section class="expertise-section">
+        <section id="capabilities" class="expertise-section">
             <div class="expertise-container">
                 <div>
                     <div class="expertise-header">
@@ -1360,6 +1360,221 @@
                 </div>
             </div>
         </section>
+        <!-- ========================================== -->
+
+        <!-- ========================================== -->
+        <!-- SITE FOOTER                                -->
+        <!-- ========================================== -->
+        <style>
+            .site-footer {
+                background: linear-gradient(180deg, #05070e 0%, #03050a 100%);
+                color: #e8f2fa;
+                border-top: 1px solid rgba(126, 232, 255, 0.14);
+                padding: 96px 5% 44px;
+                position: relative;
+                z-index: 10;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            }
+            .site-footer-inner {
+                max-width: 1280px;
+                margin: 0 auto;
+            }
+            .site-footer-cta {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: flex-end;
+                justify-content: space-between;
+                gap: 32px;
+                padding-bottom: 64px;
+                border-bottom: 1px solid rgba(145, 215, 240, 0.1);
+            }
+            .site-footer-eyebrow {
+                font-family: 'Space Mono', monospace;
+                font-size: 11px;
+                letter-spacing: 0.22em;
+                text-transform: uppercase;
+                color: #7ee8ff;
+                margin-bottom: 16px;
+            }
+            .site-footer-heading {
+                font-size: clamp(1.9rem, 3.6vw, 2.9rem);
+                font-weight: 700;
+                letter-spacing: -0.025em;
+                line-height: 1.12;
+                color: #ffffff;
+                margin: 0;
+                max-width: 660px;
+            }
+            .site-footer-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 14px;
+                align-items: center;
+            }
+            .site-footer-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                border: 1px solid rgba(126, 232, 255, 0.48);
+                color: #e8f6ff;
+                background: rgba(10, 24, 42, 0.72);
+                font-family: 'Space Mono', monospace;
+                font-size: 11.5px;
+                letter-spacing: 0.15em;
+                text-transform: uppercase;
+                padding: 14px 28px;
+                text-decoration: none;
+                cursor: pointer;
+                clip-path: polygon(11px 0%, calc(100% - 11px) 0%, 100% 11px, 100% calc(100% - 11px), calc(100% - 11px) 100%, 11px 100%, 0% calc(100% - 11px), 0% 11px);
+                transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+            }
+            .site-footer-btn:hover {
+                background: rgba(18, 44, 72, 0.92);
+                border-color: #7ee8ff;
+                transform: translateY(-2px);
+            }
+            .site-footer-btn-ghost {
+                border-color: rgba(145, 215, 240, 0.22);
+                background: rgba(10, 18, 32, 0.45);
+                color: rgba(210, 230, 246, 0.85);
+            }
+            .site-footer-grid {
+                display: grid;
+                grid-template-columns: 1.5fr 1fr 1fr 1fr;
+                gap: 44px;
+                padding: 56px 0;
+                border-bottom: 1px solid rgba(145, 215, 240, 0.08);
+            }
+            @media (max-width: 900px) {
+                .site-footer-grid {
+                    grid-template-columns: 1fr 1fr;
+                    gap: 36px;
+                }
+            }
+            @media (max-width: 560px) {
+                .site-footer-grid {
+                    grid-template-columns: 1fr;
+                    gap: 30px;
+                }
+            }
+            .site-footer-brand {
+                font-size: 1.15rem;
+                font-weight: 700;
+                letter-spacing: -0.015em;
+                color: #ffffff;
+                margin: 0 0 12px 0;
+            }
+            .site-footer-bio {
+                font-size: 0.92rem;
+                line-height: 1.72;
+                color: rgba(195, 215, 232, 0.68);
+                margin: 0;
+                max-width: 340px;
+            }
+            .site-footer-col-title {
+                font-family: 'Space Mono', monospace;
+                font-size: 11px;
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+                color: #7ee8ff;
+                margin: 0 0 18px 0;
+            }
+            .site-footer-list {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 11px;
+            }
+            .site-footer-link {
+                color: rgba(208, 226, 242, 0.78);
+                text-decoration: none;
+                font-size: 0.92rem;
+                transition: color 0.2s ease, transform 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .site-footer-link:hover {
+                color: #7ee8ff;
+                transform: translateX(3px);
+            }
+            .site-footer-bottom {
+                padding-top: 28px;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                font-family: 'Space Mono', monospace;
+                font-size: 11px;
+                letter-spacing: 0.1em;
+                color: rgba(175, 200, 222, 0.56);
+            }
+        </style>
+
+        <footer class="site-footer" id="site-footer">
+            <div class="site-footer-inner">
+                <div class="site-footer-cta">
+                    <div>
+                        <div class="site-footer-eyebrow">LET'S CONNECT</div>
+                        <h2 class="site-footer-heading">Open for UI/UX, Web &amp; Interactive Design opportunities.</h2>
+                    </div>
+                    <div class="site-footer-actions">
+                        <a class="site-footer-btn" href="https://www.linkedin.com/in/sean-forrester-615427219/" target="_blank" rel="noopener noreferrer">
+                            Connect on LinkedIn ↗
+                        </a>
+                        <button type="button" class="site-footer-btn site-footer-btn-ghost" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });">
+                            Back to Desk ↑
+                        </button>
+                    </div>
+                </div>
+
+                <div class="site-footer-grid">
+                    <div>
+                        <h3 class="site-footer-brand">Sean Forrester</h3>
+                        <p class="site-footer-bio">
+                            Digital designer &amp; developer crafting immersive web experiences, thoughtful product interfaces, and brand-driven interactive builds.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="site-footer-col-title">Selected Work</h4>
+                        <ul class="site-footer-list">
+                            <li><a class="site-footer-link" href="case-study-lunartech.html">LunarTech Academy</a></li>
+                            <li><a class="site-footer-link" href="case-study-astracare.html">Astra Assistant App</a></li>
+                            <li><a class="site-footer-link" href="case-study-fuse.html">2025 FUSE Website</a></li>
+                            <li><a class="site-footer-link" href="case-study-exhibit.html">2025 Art Exhibit</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="site-footer-col-title">Navigation</h4>
+                        <ul class="site-footer-list">
+                            <li><a class="site-footer-link" href="#about-me">About Me</a></li>
+                            <li><a class="site-footer-link" href="#capabilities">Areas of Expertise</a></li>
+                            <li><a class="site-footer-link" href="#my-process">How I Work</a></li>
+                            <li><a class="site-footer-link" href="#" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;">3D Workspace</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="site-footer-col-title">Socials</h4>
+                        <ul class="site-footer-list">
+                            <li><a class="site-footer-link" href="https://www.linkedin.com/in/sean-forrester-615427219/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></li>
+                            <li><a class="site-footer-link" href="https://github.com/Mauzzed" target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
+                            <li><a class="site-footer-link" href="https://sforrester.itch.io" target="_blank" rel="noopener noreferrer">Itch.io ↗</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="site-footer-bottom">
+                    <span>&copy; 2026 Sean Forrester. All rights reserved.</span>
+                    <span>INTERACTIVE PORTFOLIO &middot; PEORIA, IL</span>
+                </div>
+            </div>
+        </footer>
         <!-- ========================================== -->
 
     </div>
