@@ -1425,6 +1425,196 @@ document.addEventListener('DOMContentLoaded', function() {
 <path d="M49.1666 108.167V92.2263C49.1666 89.2847 50.0708 86.728 51.5286 84.4187C52.5287 82.834 51.8438 80.5861 50.0374 80.0895C35.0752 75.9763 24.5833 69.3628 24.5833 47.4264C24.5833 41.7234 26.4519 36.3615 29.7365 31.6948C30.554 30.5334 30.9626 29.9527 31.0609 29.4267C31.1592 28.9008 30.9884 28.2144 30.6466 26.8416C29.256 21.2543 29.3461 15.3213 31.4333 9.97212C31.4333 9.97212 35.7462 8.56689 45.5626 14.6993C47.8038 16.0995 48.9245 16.7996 49.9115 16.9561C50.8983 17.1127 52.2179 16.7847 54.8567 16.1287C58.4655 15.2316 62.184 14.75 66.375 14.75C70.5659 14.75 74.2844 15.2316 77.8933 16.1287C80.532 16.7847 81.8517 17.1127 82.8384 16.9561C83.8257 16.7996 84.9462 16.0995 87.1872 14.6993C97.0039 8.56689 101.317 9.97212 101.317 9.97212C103.404 15.3213 103.494 21.2543 102.103 26.8416C101.762 28.2144 101.591 28.9008 101.689 29.4267C101.787 29.9527 102.196 30.5334 103.013 31.6948C106.298 36.3615 108.167 41.7234 108.167 47.4264C108.167 69.3628 97.675 75.9763 82.7126 80.0895C80.9062 80.5861 80.2213 82.834 81.2213 84.4187C82.6791 86.728 83.5833 89.2847 83.5833 92.2263V108.167" stroke="black" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 </div>
+<style id="fellowship-recognition-style">
+#fellowship-recognition {
+    background: #0c0e14;
+    color: #e5e2e1;
+    padding: 72px 5% 110px;
+    border-top: 1px solid rgba(56, 155, 255, 0.14);
+    font-family: "Manrope", "Inter", sans-serif;
+    box-sizing: border-box;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+}
+#fellowship-recognition * { box-sizing: border-box; }
+.fr-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+.fr-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+.fr-eyebrow {
+    font-family: "Epilogue", "Inter", sans-serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #389BFF;
+    margin: 0 0 14px 0;
+}
+.fr-title {
+    font-family: "Faustina", Georgia, serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 600;
+    line-height: 1.15;
+    color: #ffffff;
+    margin: 0 0 14px 0;
+}
+.fr-subtitle {
+    font-size: 17px;
+    line-height: 1.65;
+    color: #a1a1aa;
+    max-width: 680px;
+    margin: 0 auto;
+}
+.fr-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 32px;
+    align-items: stretch;
+}
+@media (max-width: 960px) {
+    .fr-grid { grid-template-columns: 1fr; }
+}
+.fr-cert-card {
+    background: rgba(20, 24, 34, 0.72);
+    border: 1px solid rgba(56, 155, 255, 0.24);
+    border-radius: 12px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 24px 56px -16px rgba(0, 0, 0, 0.75);
+}
+.fr-cert-frame {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #05070c;
+}
+.fr-cert-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.fr-cert-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(56, 155, 255, 0.16);
+    font-family: "Epilogue", "Inter", sans-serif;
+    font-size: 12px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #9fb7d4;
+}
+.fr-cert-meta strong {
+    color: #389BFF;
+    font-weight: 600;
+}
+.fr-quote-card {
+    background: linear-gradient(180deg, rgba(20, 27, 42, 0.86) 0%, rgba(13, 17, 26, 0.94) 100%);
+    border: 1px solid rgba(56, 155, 255, 0.28);
+    border-radius: 12px;
+    padding: 36px 34px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 24px 56px -16px rgba(0, 0, 0, 0.75);
+}
+.fr-quote-label {
+    font-family: "Epilogue", "Inter", sans-serif;
+    font-size: 11.5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #389BFF;
+    margin: 0 0 18px 0;
+}
+.fr-quote-mark {
+    font-family: "Faustina", Georgia, serif;
+    font-size: 58px;
+    line-height: 0.7;
+    color: rgba(56, 155, 255, 0.45);
+    margin: 0 0 14px 0;
+    user-select: none;
+}
+.fr-quote-body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+.fr-quote-body p {
+    font-size: 16.5px;
+    line-height: 1.72;
+    color: #e5e8f2;
+    margin: 0 0 18px 0;
+}
+.fr-quote-body p:last-child {
+    margin-bottom: 0;
+    color: #c8d6eb;
+}
+.fr-author {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(56, 155, 255, 0.2);
+}
+.fr-author-name {
+    font-family: "Faustina", Georgia, serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 4px 0;
+}
+.fr-author-role {
+    font-family: "Epilogue", "Inter", sans-serif;
+    font-size: 12px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: #389BFF;
+    margin: 0;
+}
+</style>
+<section id="fellowship-recognition" aria-label="Fellowship Certificate and Letter of Recommendation">
+    <div class="fr-inner">
+        <div class="fr-header">
+            <p class="fr-eyebrow">Fellowship Recognition</p>
+            <h2 class="fr-title">Certificate &amp; Letter of Recommendation</h2>
+            <p class="fr-subtitle">Official completion of the LunarTech Fellowship Program as a UI/UX Designer, alongside executive feedback from LunarTech leadership.</p>
+        </div>
+        <div class="fr-grid">
+            <div class="fr-cert-card">
+                <div class="fr-cert-frame">
+                    <img src="assets/lunartech/fellowship_certificate.jpg" alt="Sean Forrester Certificate of Completion for The LunarTech Fellowship Program as a UI/UX Designer, signed by Tatev Aslanyan and Vahe Aslanyan" loading="lazy">
+                </div>
+                <div class="fr-cert-meta">
+                    <span><strong>LunarTech Fellowship Program</strong> | UI/UX Designer</span>
+                    <span>ID: LT-FP-2026-00019 | Nov 6, 2026</span>
+                </div>
+            </div>
+            <div class="fr-quote-card">
+                <div>
+                    <p class="fr-quote-label">Letter of Recommendation</p>
+                    <div class="fr-quote-mark" aria-hidden="true">&ldquo;</div>
+                    <blockquote class="fr-quote-body">
+                        <p>What distinguishes Sean is his ability to contribute significantly beyond the traditional responsibilities of a UI/UX Designer. While most designers focus primarily on wireframing, prototyping, visual design, and user experience, Sean has demonstrated the initiative and technical capability to undertake responsibilities that would ordinarily fall within the scope of a front-end or web developer.</p>
+                        <p>Based on his performance and contributions, I strongly recommend Sean for opportunities involving UI/UX design, product design, AI-assisted application development, and related technical disciplines.</p>
+                    </blockquote>
+                </div>
+                <div class="fr-author">
+                    <p class="fr-author-name">Vahe Aslanyan</p>
+                    <p class="fr-author-role">Chief Executive Officer, LUNARTECH | October 26, 2026</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 	<!-- Start of bodyEnd -->
     <!-- Snippet: aYIyxjQQb -->
 <style>
