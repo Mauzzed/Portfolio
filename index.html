@@ -1509,7 +1509,11 @@
         const gltfLoader = new THREE.GLTFLoader(loadingManager);
 
         function base64ToArrayBuffer(base64) {
-            const binaryString = window.atob(base64.split(',')[1] || base64);
+            if (!base64 || typeof base64 !== 'string') return new ArrayBuffer(0);
+            let raw = (base64.includes(',') ? base64.split(',')[1] : base64).replace(/[^A-Za-z0-9+/=]/g, '');
+            const pad = raw.length % 4;
+            if (pad) raw += '='.repeat(4 - pad);
+            const binaryString = window.atob(raw);
             const len = binaryString.length;
             const bytes = new Uint8Array(len);
             for (let i = 0; i < len; i++) {
@@ -1519,11 +1523,13 @@
         }
 
         function loadGlbFromBase64(base64Data, callback) {
+            if (!base64Data || typeof base64Data !== 'string' || base64Data.length < 32) return;
             const itemUrl = 'glb_' + Math.random();
             loadingManager.itemStart(itemUrl);
             setTimeout(() => {
                 try {
                     const buffer = base64ToArrayBuffer(base64Data);
+                    if (!buffer.byteLength) { loadingManager.itemEnd(itemUrl); return; }
                     gltfLoader.parse(buffer, '', (gltf) => {
                         try { callback(gltf); } catch(e) { console.error(e); }
                         loadingManager.itemEnd(itemUrl);
@@ -2280,11 +2286,47 @@
         const matTitanArmor = new THREE.MeshStandardMaterial({ color: 0xd7c49e, roughness: 0.6 });
         const matTitanMuscle = new THREE.MeshStandardMaterial({ color: 0x8b1a1a, roughness: 0.8 });
 
-        // Load High-Res Reference Image Textures for Character Faces & Standees
-        const tAoTLevi = textureLoader.load('aot_levi.png');
-        const tAoTEren = textureLoader.load('aot_eren.png');
-        const tAoTHange = textureLoader.load('aot_hange.png');
-        const tAoTTitan = textureLoader.load('aot_titan.png');
+        // Procedural High-Contrast Funko Pop Face Decals (avoids missing external PNG 404s)
+        function createFunkoFaceTexture(kind) {
+            const c = document.createElement('canvas');
+            c.width = 256; c.height = 256;
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, 256, 256);
+            // Classic Funko round black eyes + specular glint
+            const eyeColor = kind === 'titan' ? '#22d3ee' : '#0b0b0e';
+            [82, 174].forEach((ex) => {
+                ctx.fillStyle = eyeColor;
+                ctx.beginPath(); ctx.arc(ex, 134, 24, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(ex - 7, 125, 6, 0, Math.PI * 2); ctx.fill();
+            });
+            // Character eyebrows
+            ctx.strokeStyle = kind === 'hange' ? '#4a2c18' : '#18181b';
+            ctx.lineWidth = 7; ctx.lineCap = 'round';
+            if (kind === 'levi') {
+                ctx.beginPath(); ctx.moveTo(58, 96); ctx.lineTo(104, 102); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(198, 96); ctx.lineTo(152, 102); ctx.stroke();
+            } else if (kind === 'eren' || kind === 'titan') {
+                ctx.beginPath(); ctx.moveTo(58, 92); ctx.lineTo(106, 104); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(198, 92); ctx.lineTo(150, 104); ctx.stroke();
+            } else {
+                ctx.beginPath(); ctx.moveTo(60, 98); ctx.lineTo(102, 92); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(196, 98); ctx.lineTo(154, 92); ctx.stroke();
+            }
+            if (kind === 'titan') {
+                ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 4;
+                for (let x = 86; x <= 170; x += 14) {
+                    ctx.beginPath(); ctx.moveTo(x, 182); ctx.lineTo(x, 206); ctx.stroke();
+                }
+            }
+            const tex = new THREE.CanvasTexture(c);
+            tex.needsUpdate = true;
+            return tex;
+        }
+        const tAoTLevi = createFunkoFaceTexture('levi');
+        const tAoTEren = createFunkoFaceTexture('eren');
+        const tAoTHange = createFunkoFaceTexture('hange');
+        const tAoTTitan = createFunkoFaceTexture('titan');
 
         // Master 3D Sculpted Funko Builder
         function buildSculptedHead(matSkin, faceTex, hairMat, hairStyle) {
