@@ -1429,13 +1429,20 @@ document.addEventListener('DOMContentLoaded', function() {
 #fellowship-recognition {
     background: #0c0e14;
     color: #e5e2e1;
-    padding: 72px 5% 110px;
+    margin-top: -160px;
+    padding: 64px 5% 104px;
     border-top: 1px solid rgba(56, 155, 255, 0.14);
     font-family: "Manrope", "Inter", sans-serif;
     box-sizing: border-box;
     width: 100%;
     position: relative;
     z-index: 2;
+}
+@media (max-width: 1199px) {
+    #fellowship-recognition { margin-top: -80px; }
+}
+@media (max-width: 809px) {
+    #fellowship-recognition { margin-top: -32px; padding: 44px 5% 72px; }
 }
 #fellowship-recognition * { box-sizing: border-box; }
 .fr-inner {
